@@ -1,0 +1,29 @@
+{
+    "name": "m6web/aws-bundle",
+    "description": "Bundle Client AWS",
+    "autoload": {
+        "psr-0": { "": "src/" }
+    },
+    "repositories": [
+        {
+            "type": "composer",
+            "url": "http://satis.m6web.fr"
+        },
+        {
+            "type": "composer",
+            "url": "http://satis-dependencies.m6web.fr"
+        },
+        {
+            "packagist": false
+        }
+    ],
+    "minimum-stability" : "dev",
+    "prefer-stable": true,
+    "require": {
+        "php"             : ">=5.4",
+        "aws/aws-sdk-php" : "~2.6"
+    },
+    "require-dev": {
+        "atoum/atoum-bundle" : "dev-master"
+    }
+}
