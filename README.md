@@ -77,3 +77,11 @@
  - Sts
  - Support
  - Swf
+
+
+# Unit Test
+
+```
+    composer install
+    ./vendor/bin/atoum -d src/M6Web/Bundle/AwsBundle/Tests
+```
