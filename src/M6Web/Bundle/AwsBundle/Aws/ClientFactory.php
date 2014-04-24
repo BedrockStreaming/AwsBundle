@@ -23,7 +23,7 @@ class ClientFactory
      * @param string $factoryClass Factory class name
      * @param array $aliasKeys Alias key list
      */
-    public function __construct($factoryClass,array $aliasKeys = array())
+    public function __construct($factoryClass, array $aliasKeys = array())
     {
         if (!$this->testFactoryClass($factoryClass)) {
             throw new \InvalidArgumentException(
