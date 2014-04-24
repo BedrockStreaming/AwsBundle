@@ -15,7 +15,7 @@ class ClientFactory
     /**
      * @var array
      */
-    private $aliasKeys;
+    protected $aliasKeys;
 
     /**
      * __construct
@@ -45,7 +45,7 @@ class ClientFactory
      *
      * @return boolean
      */
-    private function testFactoryClass($factoryClass)
+    protected function testFactoryClass($factoryClass)
     {
         if ($factoryClass == self::AWS_FACTORY_CLASS) {
             return true;
