@@ -31,8 +31,6 @@ class M6WebAwsExtension extends Extension
             $container->setParameter('m6web_aws.aws_factory.class', $config['aws_factory_class']);
         }
 
-
-
         $credentials = $config['credentials'];
         $clients     = $config['clients'];
 
@@ -44,8 +42,10 @@ class M6WebAwsExtension extends Extension
     /**
      * loadClient
      *
-     * @param ContainerBuilder $container Container
-     * @param array            $config    Client config
+     * @param ContainerBuilder $container   Container
+     * @param string           $name        Service name
+     * @param array            $config      Client config
+     * @param array            $credentials Credentials accounts
      */
     protected function loadClient(ContainerBuilder $container, $name, array $config, array $credentials)
     {
