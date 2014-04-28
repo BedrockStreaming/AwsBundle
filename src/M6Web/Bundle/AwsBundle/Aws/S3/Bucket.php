@@ -41,7 +41,7 @@ class Bucket
      */
     public function isValidName()
     {
-        return S3Client::isValidBucketName($this->name)
+        return S3Client::isValidBucketName($this->name);
     }
 
     /**
