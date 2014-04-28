@@ -34,7 +34,11 @@
             - `service`: "S3" [required] AWS service Alias (see below)
             - `region`: "us-west-1" [optional] Override region name.
 
-
+    - `s3`:
+        - `buckets`:
+            - `dev`: Name of the bucket (use from define service name)
+                - `name`: "s3-bucket-name" Real name of the bucket
+                - `client`: "6cloud_cdn" Client name defined above
 
 
 
