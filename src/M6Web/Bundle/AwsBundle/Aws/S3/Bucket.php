@@ -176,7 +176,7 @@ class Bucket
      */
     public function putAcl(array $params = array())
     {
-        $params['Bucket'] => $this->name;
+        $params['Bucket'] = $this->name;
 
         return $this->client->putBucketAcl($params);
     }
