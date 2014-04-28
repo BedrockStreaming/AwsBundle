@@ -836,7 +836,7 @@ class Bucket
     public function abortMultipartUpload($key, $uploadId)
     {
         return $this->client->abortMultipartUpload([
-            'Bucket'   => $this->name
+            'Bucket'   => $this->name,
             'Key'      => $key,
             'UploadId' => $uploadId
         ]);
