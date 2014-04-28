@@ -18,7 +18,7 @@ class Configuration implements ConfigurationInterface
     public function getConfigTreeBuilder()
     {
         $treeBuilder = new TreeBuilder();
-        $rootNode = $treeBuilder->root('m6web_aws');
+        $rootNode    = $treeBuilder->root('m6web_aws');
 
         $rootNode
             ->children()
@@ -71,6 +71,25 @@ class Configuration implements ConfigurationInterface
                                 ->cannotBeEmpty()
                             ->end()
                             ->scalarNode('region')
+                            ->end()
+                        ->end()
+                    ->end()
+                ->end()
+                ->arrayNode('s3')
+                    ->children()
+                    ->arrayNode('buckets')
+                        ->requiresAtLeastOneElement()
+                        ->useAttributeAsKey('alias')
+                        ->prototype('array')
+                            ->children()
+                                ->scalarNode('client')
+                                    ->isRequired()
+                                    ->cannotBeEmpty()
+                                ->end()
+                                ->scalarNode('name')
+                                    ->isRequired()
+                                    ->cannotBeEmpty()
+                                ->end()
                             ->end()
                         ->end()
                     ->end()
