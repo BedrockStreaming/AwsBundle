@@ -76,6 +76,7 @@ class Configuration implements ConfigurationInterface
                     ->end()
                 ->end()
                 ->arrayNode('s3')
+                    ->children()
                     ->arrayNode('buckets')
                         ->requiresAtLeastOneElement()
                         ->useAttributeAsKey('alias')

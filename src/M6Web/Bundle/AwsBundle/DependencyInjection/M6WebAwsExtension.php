@@ -37,6 +37,8 @@ class M6WebAwsExtension extends Extension
         foreach ($clients as $name => $client) {
             $this->loadClient($container, $name, $client, $credentials);
         }
+
+        $this->loadS3($container, $config['s3']);
     }
 
     /**
@@ -67,6 +69,42 @@ class M6WebAwsExtension extends Extension
                     ->setFactoryMethod('get');
 
         $container->setDefinition(sprintf('m6web_aws.%s', $name), $definition);
+    }
+
+    /**
+     * loadClient
+     *
+     * @param ContainerBuilder $container   Container
+     * @param array            $configs     Client config
+     */
+    protected function loadS3(ContainerBuilder $container, array $configs)
+    {
+        if (!empty($configs['buckets'])) {
+            foreach ($configs['buckets'] as $name => $config) {
+                $this->loadBucket($container, $name, $config);
+            }
+        }
+    }
+
+    /**
+     * loadBucket
+     *
+     * @param ContainerBuilder $container Container
+     * @param string           $name      Service name
+     * @param array            $configs   Client config
+     */
+    protected function loadBucket(ContainerBuilder $container, $name, $config)
+    {
+        $className  = $container->getParameter('m6web_aws.bucket.class');
+        $clientName = sprintf('m6web_aws.%s', $config['client']);
+        $params     = array(
+            'client' => new Reference($clientName),
+            'name'   => $config['name']
+        );
+
+        $definition = new Definition($className, $params);
+
+        $container->setDefinition(sprintf('m6web_aws.bucket.%s', $name), $definition);
     }
 
 }

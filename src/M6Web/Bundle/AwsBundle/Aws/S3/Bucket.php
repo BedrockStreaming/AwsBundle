@@ -25,13 +25,10 @@ class Bucket
      * @param S3Client $client Aws S3 Client
      * @param string   $name   Bucket name
      */
-    public function __construct(S3Client $client, $name, $create = false)
+    public function __construct(S3Client $client, $name)
     {
         $this->client = $client;
-
-        if ($create && !$this->exist()) {
-            $this->create();
-        }
+        $this->name   = $name;
     }
 
     /**
