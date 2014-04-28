@@ -203,6 +203,7 @@ class Bucket
         $params = [
             'Bucket'    => $this->name,
             'CORSRules' => $corsRules
+        ];
 
         return $this->client->putBucketCors($params);
     }
