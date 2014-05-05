@@ -681,7 +681,7 @@ class Bucket
     }
 
     /**
-     * deleteMatchingObject
+     * deleteMatchingObjects
      *
      * @param string $prefix
      * @param string $regex
@@ -689,9 +689,9 @@ class Bucket
      *
      * @return integer
      */
-    public function deleteMatchingObject($prefix = '', $regex = '', array $options = array())
+    public function deleteMatchingObjects($prefix = '', $regex = '', array $options = array())
     {
-        return $this->client->deleteMatchingObject($this->name, $prefix, $regex, $options);
+        return $this->client->deleteMatchingObjects($this->name, $prefix, $regex, $options);
     }
 
     /**
