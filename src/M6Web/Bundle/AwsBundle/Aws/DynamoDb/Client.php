@@ -258,17 +258,20 @@ class Client
      * 
      * @return Guzzle\Service\Resource\Model
      */
-    public function getItem($tableName, array $key, array $attributesToGet = [], $consistentRead = false, $returnConsumedCapacity = self::CAPACITY_NONE)
+    public function getItem($tableName, array $key, array $attributesToGet = null, $consistentRead = false, $returnConsumedCapacity = self::CAPACITY_NONE)
     {
-        return $this->client->getItem(
-            [
-                'TableName'              => $tableName,
-                'Key'                    => $key,
-                'AttributesToGet'        => $attributesToGet,
-                'ConsistentRead'         => $consistentRead,
-                'ReturnConsumedCapacity' => $returnConsumedCapacity
-            ]
-        );
+        $args = [
+            'TableName'              => $tableName,
+            'Key'                    => $key,
+            'ConsistentRead'         => $consistentRead,
+            'ReturnConsumedCapacity' => $returnConsumedCapacity
+        ];
+
+        if ($attributesToGet !== null) {
+            $args['AttributesToGet'] = $attributesToGet;
+        }
+        
+        return $this->client->getItem($args);
     }
 
     /**
@@ -315,19 +318,22 @@ class Client
      * 
      * @return Guzzle\Service\Resource\Model
      */
-    public function putItem($tableName, array $item, array $expected = [], $conditionnalOperator = self::COND_AND, $returnValues = self::RETURN_NONE, $returnConsumedCapacity = self::CAPACITY_NONE, $returnItemCollectionMetrics = self::METRICS_NONE)
+    public function putItem($tableName, array $item, array $expected = null, $conditionnalOperator = self::COND_AND, $returnValues = self::RETURN_NONE, $returnConsumedCapacity = self::CAPACITY_NONE, $returnItemCollectionMetrics = self::METRICS_NONE)
     {
-        return $this->client->putItem(
-            [
-                'TableName'                   => $tableName,
-                'Item'                        => $item,
-                'Expected'                    => $expected,
-                'ConditionnalOperator'        => $conditionnalOperator,
-                'ReturnValues'                => $returnValues,
-                'ReturnConsumedCapacity'      => $returnConsumedCapacity,
-                'ReturnItemCollectionMetrics' => $returnItemCollectionMetrics
-            ]
-        );
+        $args = [
+            'TableName'                   => $tableName,
+            'Item'                        => $item,
+            'ConditionnalOperator'        => $conditionnalOperator,
+            'ReturnValues'                => $returnValues,
+            'ReturnConsumedCapacity'      => $returnConsumedCapacity,
+            'ReturnItemCollectionMetrics' => $returnItemCollectionMetrics
+        ];
+
+        if ($expected !== null) {
+            $args['Expected'] = $expected;
+        }
+
+        return $this->client->putItem($args);
     }
 
     /* TODO */
@@ -352,20 +358,26 @@ class Client
      * 
      * @return Guzzle\Service\Resource\Model
      */
-    public function updateItem($tableName, array $key, array $attributeUpdates = [], array $expected = [], $conditionnalOperator = self::COND_AND, $returnValues = self::RETURN_NONE, $returnConsumedCapacity = self::CAPACITY_NONE, $returnItemCollectionMetrics = self::METRICS_NONE)
+    public function updateItem($tableName, array $key, array $attributeUpdates = null, array $expected = null, $conditionnalOperator = self::COND_AND, $returnValues = self::RETURN_NONE, $returnConsumedCapacity = self::CAPACITY_NONE, $returnItemCollectionMetrics = self::METRICS_NONE)
     {
-        return $this->client->updateItem(
-            [
-                'TableName'                   => $tableName,
-                'Key'                         => $key,
-                'AttributeUpdates'            => $attributeUpdates,
-                'Expected'                    => $expected,
-                'ConditionnalOperator'        => $conditionnalOperator,
-                'ReturnValues'                => $returnValues,
-                'ReturnConsumedCapacity'      => $returnConsumedCapacity,
-                'ReturnItemCollectionMetrics' => $returnItemCollectionMetrics
-            ]
-        );
+        $args = [
+            'TableName'                   => $tableName,
+            'Key'                         => $key,
+            'ConditionnalOperator'        => $conditionnalOperator,
+            'ReturnValues'                => $returnValues,
+            'ReturnConsumedCapacity'      => $returnConsumedCapacity,
+            'ReturnItemCollectionMetrics' => $returnItemCollectionMetrics
+        ];
+
+        if ($attributeUpdates !== null) {
+            $args['AttributeUpdates'] = $attributeUpdates;
+        }
+
+        if ($expected !== null) {
+            $args['Expected'] = $expected;
+        }
+
+        return $this->client->updateItem($args);
     }
 
     /* TODO */
