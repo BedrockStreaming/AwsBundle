@@ -3,6 +3,7 @@
 namespace M6Web\Bundle\AwsBundle\Aws\DynamoDb;
 
 use Aws\DynamoDb\DynamoDbClient;
+use Aws\DynamoDb\Model\Attribute;
 
 /**
  * DynamoDb Client
@@ -63,7 +64,7 @@ class Client
      * 
      * @return array The formatted value
      */
-    public function formatValue($value, $format = Aws\DynamoDB\Attribute::FORMAT_PUT)
+    public function formatValue($value, $format = Attribute::FORMAT_PUT)
     {
         return $this->client->formatValue($value, $format);
     }
@@ -76,7 +77,7 @@ class Client
      * 
      * @return array The formatted values
      */
-    public function formatAttributes(array $values, $format = Aws\DynamoDB\Attribute::FORMAT_PUT)
+    public function formatAttributes(array $values, $format = Attribute::FORMAT_PUT)
     {
         return $this->client->formatAttributes($values, $format);
     }
@@ -156,8 +157,8 @@ class Client
      *
      * @see http://docs.aws.amazon.com/aws-sdk-php/latest/class-Aws.DynamoDb.DynamoDbClient.html#_createTable
      *
-     * @param array  $attributeDefinitions   An array of attributes that describe the key schema for the table and indexes.
      * @param string $tableName              The name of the table to create.
+     * @param array  $attributeDefinitions   An array of attributes that describe the key schema for the table and indexes.
      * @param array  $keySchema              Specifies the attributes that make up the primary key for a table or an index
      * @param array  $provisionedThroughput  Represents the provisioned throughput settings for a specified table or index.
      * @param array  $localSecondaryIndexes  One or more local secondary indexes (the maximum is five) to be created on the table.
@@ -165,7 +166,7 @@ class Client
      * 
      * @return Guzzle\Service\Resource\Model
      */
-    public function createTable(array $attributeDefinitions, $tableName, array $keySchema, array $provisionedThroughput, array $localSecondaryIndexes = null, array $globalSecondaryIndexes = null)
+    public function createTable($tableName, array $attributeDefinitions, array $keySchema, array $provisionedThroughput, array $localSecondaryIndexes = null, array $globalSecondaryIndexes = null)
     {
         $args = [
             'AttributeDefinitions'   => $attributeDefinitions,
@@ -322,7 +323,7 @@ class Client
     {
         $args = [
             'TableName'                   => $tableName,
-            'Item'                        => $item,
+            'Item'                        => $this->formatAttributes($item),
             'ConditionnalOperator'        => $conditionnalOperator,
             'ReturnValues'                => $returnValues,
             'ReturnConsumedCapacity'      => $returnConsumedCapacity,

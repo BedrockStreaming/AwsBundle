@@ -1,5 +1,6 @@
 parameters:
     m6web_aws.bucket.class: M6Web\Bundle\AwsBundle\Aws\S3\Bucket
+    m6web_aws.dynamodb.class: M6Web\Bundle\AwsBundle\Aws\DynamoDb\Client
     m6web_aws.client.class: Aws\Common\Client\AbstractClient
     m6web_aws.client_factory.class: M6Web\Bundle\AwsBundle\Aws\ClientFactory
     m6web_aws.client_factory.name: "m6web_aws.client_factory"

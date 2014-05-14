@@ -38,7 +38,13 @@ class M6WebAwsExtension extends Extension
             $this->loadClient($container, $name, $client, $credentials);
         }
 
-        $this->loadS3($container, $config['s3']);
+        if (array_key_exists('s3', $config)) {
+            $this->loadS3($container, $config['s3']);
+        }
+
+        if (array_key_exists('dynamodb', $config)) {
+            $this->loadDynamoDb($container, $config['dynamodb']);
+        }
     }
 
     /**
@@ -62,6 +68,10 @@ class M6WebAwsExtension extends Extension
             $params['region'] = $config['region'];
         }
 
+        if (!empty($config['base_url'])) {
+            $params['base_url'] = $config['base_url'];
+        }
+
         $definition = new Definition($className, $params);
 
         $definition
@@ -72,7 +82,29 @@ class M6WebAwsExtension extends Extension
     }
 
     /**
-     * loadClient
+     * loadDynamoDb
+     *
+     * @param ContainerBuilder $container   Container
+     * @param array            $configs     Client config
+     */
+    protected function loadDynamoDb(ContainerBuilder $container, array $configs)
+    {
+        $className  = $container->getParameter('m6web_aws.dynamodb.class');
+
+        foreach ($configs as $name => $config) {
+            $clientName = sprintf('m6web_aws.%s', $config['client']);
+            $params     = array(
+                'client' => new Reference($clientName)
+            );
+
+            $definition = new Definition($className, $params);
+
+            $container->setDefinition(sprintf('m6web_aws.dynamodb.%s', $name), $definition);
+        }
+    }
+
+    /**
+     * loadS3
      *
      * @param ContainerBuilder $container   Container
      * @param array            $configs     Client config
