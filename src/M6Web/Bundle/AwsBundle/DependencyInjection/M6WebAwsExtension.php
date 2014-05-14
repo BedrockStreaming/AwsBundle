@@ -38,7 +38,9 @@ class M6WebAwsExtension extends Extension
             $this->loadClient($container, $name, $client, $credentials);
         }
 
-        $this->loadS3($container, $config['s3']);
+        if(!empty($config['s3'])){
+            $this->loadS3($container, $config['s3']);
+        }
     }
 
     /**
