@@ -201,19 +201,22 @@ class Client
      * 
      * @return Guzzle\Service\Resource\Model
      */
-    public function deleteItem($tableName, array $key, array $expected = [], $conditionnalOperator = self::COND_AND, $returnValues = self::RETURN_NONE, $returnConsumedCapacity = self::CAPACITY_NONE, $returnItemCollectionMetrics = self::METRICS_NONE)
+    public function deleteItem($tableName, array $key, array $expected = null, $conditionnalOperator = self::COND_AND, $returnValues = self::RETURN_NONE, $returnConsumedCapacity = self::CAPACITY_NONE, $returnItemCollectionMetrics = self::METRICS_NONE)
     {
-        return $this->client->deleteItem(
-            [
-                'TableName'                   => $tableName,
-                'Key'                         => $key,
-                'Expected'                    => $expected,
-                'ConditionnalOperator'        => $conditionnalOperator,
-                'ReturnValues'                => $returnValues,
-                'ReturnConsumedCapacity'      => $returnConsumedCapacity,
-                'ReturnItemCollectionMetrics' => $returnItemCollectionMetrics
-            ]
-        );
+        $args = [
+            'TableName'                   => $tableName,
+            'Key'                         => $key,
+            'ConditionnalOperator'        => $conditionnalOperator,
+            'ReturnValues'                => $returnValues,
+            'ReturnConsumedCapacity'      => $returnConsumedCapacity,
+            'ReturnItemCollectionMetrics' => $returnItemCollectionMetrics
+        ];
+
+        if ($expected !== null) {
+            $args['Expected'] = $expected;
+        }
+
+        return $this->client->deleteItem($args);
     }
 
     /**
@@ -301,6 +304,20 @@ class Client
     }
 
     /**
+     * Checks if a table with given table name exists.
+     * 
+     * @param string $tableName Table name to check the existence
+     * 
+     * @return boolean
+     */
+    public function tableExists($tableName)
+    {
+        $tables = $this->listTables();
+
+        return in_array($tableName, $tables['TableNames']);
+    }
+
+    /**
      * Creates a new item, or replaces an old item with a new item. 
      * If an item already exists in the specified table with the same primary key, 
      * the new item completely replaces the existing item. 
@@ -323,7 +340,7 @@ class Client
     {
         $args = [
             'TableName'                   => $tableName,
-            'Item'                        => $this->formatAttributes($item),
+            'Item'                        => $this->formatAttributes($item, Attribute::FORMAT_PUT),
             'ConditionnalOperator'        => $conditionnalOperator,
             'ReturnValues'                => $returnValues,
             'ReturnConsumedCapacity'      => $returnConsumedCapacity,
@@ -371,7 +388,7 @@ class Client
         ];
 
         if ($attributeUpdates !== null) {
-            $args['AttributeUpdates'] = $attributeUpdates;
+            $args['AttributeUpdates'] = $this->formatAttributes($attributeUpdates, Attribute::FORMAT_UPDATE);
         }
 
         if ($expected !== null) {
