@@ -319,11 +319,7 @@ class Client
 
     /**
      * Creates a new item, or replaces an old item with a new item. 
-     * If an item already exists in the specified table with the same primary key, 
-     * the new item completely replaces the existing item. 
-     * You can perform a conditional put (insert a new item if one with the specified primary key doesn't exist), 
-     * or replace an existing item if it has certain attribute values.
-     *
+     * 
      * @see http://docs.aws.amazon.com/aws-sdk-php/latest/class-Aws.DynamoDb.DynamoDbClient.html#_putItem
      *
      * @param string $tableName                   The name of the table to contain the item.
@@ -354,9 +350,39 @@ class Client
         return $this->client->putItem($args);
     }
 
-    /* TODO */
-    public function query() {}
-    public function scan() {}
+    /**
+     * Executes the Query operation.
+     * 
+     * @see http://docs.aws.amazon.com/aws-sdk-php/latest/class-Aws.DynamoDb.DynamoDbClient.html#_query
+     * 
+     * @param string $tableName The name of the table containing the requested items.
+     * @param array  $args      Arguments of the query
+     * 
+     * @return  Guzzle\Service\Resource\Model
+     */
+    public function query($tableName, array $args)
+    {
+        $args['TableName'] = $tableName;
+
+        return $this->client->query($args);
+    }
+
+    /**
+     * Executes the Scan operation.
+     * 
+     * @see http://docs.aws.amazon.com/aws-sdk-php/latest/class-Aws.DynamoDb.DynamoDbClient.html#_scan
+     * 
+     * @param string $tableName The name of the table containing the requested items.
+     * @param array  $args      Arguments of the query
+     * 
+     * @return  Guzzle\Service\Resource\Model
+     */
+    public function scan($tableName, array $args)
+    {
+        $args['TableName'] = $tableName;
+
+        return $this->client->scan($args);
+    }
 
     /**
      * Edits an existing item's attributes, or inserts a new item if it does not already exist. 
@@ -398,12 +424,134 @@ class Client
         return $this->client->updateItem($args);
     }
 
-    /* TODO */
-    public function updateTable() {}
-    public function waitUntilTableExists() {}
-    public function waitUntilTableNotExists() {}
-    public function getBatchGetItemIterator() {}
-    public function getListTablesIterator() {}
-    public function getQueryIterator() {}
-    public function getScanIterator() {}
+    /**
+     * Executes the UpdateTable operation.
+     *
+     * @see http://docs.aws.amazon.com/aws-sdk-php/latest/class-Aws.DynamoDb.DynamoDbClient.html#_updateTable
+     *
+     * @param string $tableName              The name of the table to be updated.
+     * @param array  $provisionedThroughput  Represents the provisioned throughput settings for a specified table or index.
+     * @param array  $globalSecondaryIndexes An array of one or more global secondary indexes on the table, together with provisioned throughput settings for each index.
+     * 
+     * @return Guzzle\Service\Resource\Model
+     */
+    public function updateTable($tableName, array $provisionedThroughput = null, array $globalSecondaryIndexes = null)
+    {
+        $args = [
+            'TableName'              => $tableName,
+        ];
+
+        if ($provisionedThroughput !== null) {
+            $args['ProvisionedThroughput'] = $provisionedThroughput;
+        }
+
+        if ($globalSecondaryIndexes !== null) {
+            $args['GlobalSecondaryIndexes'] = $globalSecondaryIndexes;
+        }
+
+        return $this->client->updateTable($args);
+    }
+
+    /**
+     * Wait until a table exists and can be accessed.
+     * 
+     * @param string $tableName The table name to wait for.
+     * 
+     * @return void
+     */
+    public function waitUntilTableExists($tableName)
+    {
+        $this->client->waitUntilTableExists(['TableName' => $tableName]);
+    }
+
+    /**
+     * Wait until a table is deleted.
+     * 
+     * @param string $tableName The table name to wait for.
+     * 
+     * @return void
+     */
+    public function waitUntilTableNotExists($tableName)
+    {
+        $this->client->waitUntilTableNotExists(['TableName' => $tableName]);
+    }
+
+    /**
+     * Executes the GetBatchGetItemIterator operation.
+     *
+     * @see http://docs.aws.amazon.com/aws-sdk-php/latest/class-Aws.DynamoDb.DynamoDbClient.html#_getBatchGetItemIterator
+     *
+     * @param array  $requestItems           Associative array of <TableName> keys mapping to (associative-array) values.
+     * @param string $returnConsumedCapacity Sets consumed capacity return mode.
+     * 
+     * @return  Guzzle\Service\Resource\ResourceIteratorInterface
+     */
+    public function getBatchGetItemIterator(array $requestItems, $returnConsumedCapacity = self::CAPACITY_NONE)
+    {
+        return $this->client->getBatchGetItemIterator(
+            [
+                'RequestItems'           => $requestItems,
+                'ReturnConsumedCapacity' => $returnConsumedCapacity
+            ]
+        );
+    }
+
+    /**
+     * Returns an interator on the tables associated with the current account and endpoint.
+     * 
+     * @see http://docs.aws.amazon.com/aws-sdk-php/latest/class-Aws.DynamoDb.DynamoDbClient.html#_getListTablesIterator
+     *
+     * @param string  $exclusiveStartTableName Name of the table that starts the list.
+     * @param integer $limit                   A maximum number of tables to return.
+     * 
+     * @return   Guzzle\Service\Resource\ResourceIteratorInterface
+     */
+    public function getListTablesIterator($exclusiveStartTableName = null, $limit = null)
+    {
+        $params = [];
+
+        if (is_string($exclusiveStartTableName)) {
+            $params['ExclusiveStartTableName'] = $exclusiveStartTableName;
+        }
+
+        if (is_numeric($limit)) {
+            $params['Limit'] = $limit;
+        }
+
+        return $this->client->getListTablesIterator($params);
+    }
+
+    /**
+     * Executes the GetQueryIterator operation.
+     * 
+     * @see http://docs.aws.amazon.com/aws-sdk-php/latest/class-Aws.DynamoDb.DynamoDbClient.html#_getQueryIterator
+     * 
+     * @param string $tableName The name of the table containing the requested items.
+     * @param array  $args      Arguments of the query
+     * 
+     * @return  Guzzle\Service\Resource\ResourceIteratorInterface
+     */
+    public function getQueryIterator($tableName, array $args)
+    {
+        $args['TableName'] = $tableName;
+
+        return $this->client->getQueryIterator($args);
+    }
+
+    /**
+     * Executes the GetScanIterator operation.
+     * 
+     * @see http://docs.aws.amazon.com/aws-sdk-php/latest/class-Aws.DynamoDb.DynamoDbClient.html#_getScanIterator
+     * 
+     * @param string $tableName The name of the table containing the requested items.
+     * @param array  $args      Arguments of the query
+     * 
+     * @return Guzzle\Service\Resource\ResourceIteratorInterface
+     */
+    public function getScanIterator($tableName, array $args)
+    {
+        $args['TableName'] = $tableName;
+
+        return $this->client->getScanIterator($args);
+    }
 }
