@@ -39,7 +39,9 @@
             - `dev`: Name of the bucket (use from define service name)
                 - `name`: "s3-bucket-name" Real name of the bucket
                 - `client`: "6cloud_cdn" Client name defined above
-
+    - `sqs`:
+	- `dev`: Name of the sqs config (use from define service name)
+	    - `client`: "sqs_client" Client name defined above
 
 
 ### AWS Services Alias :
@@ -82,6 +84,29 @@
  - Support
  - Swf
 
+# SQS Example
+
+```
+    $client = $this->getContainer()->get('m6web_aws.sqs.workers');
+    $queue = $client->getQueue('queue_test');
+
+    for ($i=0; $i<100; $i++) {
+	echo $client->sendMessage($queue, "hello world $i") . "\n";
+    }
+
+    $i = 0;
+    while($messages = $client->receiveMessage($queue, 10)) {
+	foreach($messages as $message) {
+	    echo $message['Body'] . "... ";
+	    if ($client->deleteMessage($queue, $message['ReceiptHandle'])) {
+		echo "OK\n";
+		$i++;
+	    } else echo "ERROR\n";
+	}
+    }
+
+    echo"\n===> READ : $i\n";
+```
 
 # Unit Test
 

@@ -41,6 +41,10 @@ class M6WebAwsExtension extends Extension
         if(!empty($config['s3'])){
             $this->loadS3($container, $config['s3']);
         }
+
+        if (array_key_exists('sqs', $config)) {
+            $this->loadSqs($container, $config['sqs']);
+        }
     }
 
     /**
@@ -74,7 +78,29 @@ class M6WebAwsExtension extends Extension
     }
 
     /**
-     * loadClient
+     * loadSqs
+     *
+     * @param ContainerBuilder $container   Container
+     * @param array            $configs     Client config
+     */
+    protected function loadSqs(ContainerBuilder $container, array $configs)
+    {
+        $className  = $container->getParameter('m6web_aws.sqs.class');
+
+        foreach ($configs as $name => $config) {
+            $clientName = sprintf('m6web_aws.%s', $config['client']);
+            $params     = array(
+                'client' => new Reference($clientName)
+            );
+
+            $definition = new Definition($className, $params);
+
+            $container->setDefinition(sprintf('m6web_aws.sqs.%s', $name), $definition);
+        }
+    }
+
+    /**
+     * loadS3
      *
      * @param ContainerBuilder $container   Container
      * @param array            $configs     Client config
