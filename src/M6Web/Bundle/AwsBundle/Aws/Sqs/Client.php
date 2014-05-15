@@ -114,17 +114,23 @@ class Client
      * @param string  $queue
      * @param string  $message
      * @param integer $delay
-     * @param array   $attributes
+     * @param array   $messageAttributes
      *
      * @return string|null
      */
-    public function sendMessage($queue, $message, $delay = 0, array $attributes = array())
+    public function sendMessage($queue, $message, $delay = 0, array $messageAttributes = array())
     {
-        $result = $this->client->sendMessage([
+        $args = [
             'QueueUrl' => $queue,
             'MessageBody' => $message,
             'DelaySeconds' => $delay,
-        ]);
+        ];
+
+        if (!empty($messageAttributes)) {
+            $args['MessageAttributes'] = $messageAttributes;
+        }
+
+        $result = $this->client->sendMessage($args);
 
         if ($result instanceof Model) {
             return $result->get('MessageId');
