@@ -6,6 +6,7 @@ require_once __DIR__ . '/../../../../../../../../vendor/autoload.php';
 
 use atoum;
 use M6Web\Bundle\AwsBundle\Aws\Sqs\Client as Base;
+use Aws\Sqs\Exception\SqsException;
 
 /**
  * Client
@@ -20,6 +21,37 @@ class Client extends atoum
             ->and($client = new Base($clientSqs))
                 ->object($client->getClient())
                     ->isIdenticalTo($clientSqs);
+    }
+
+    public function testGetQueue()
+    {
+        // Get queue ok
+        $clientSqs = $this->getClientSqs();
+
+        $this
+            ->if($client = new Base($clientSqs))
+            ->and($queueName = 'name')
+            ->and($params = ['QueueName' => $queueName])
+                ->string($client->getQueue($queueName))
+                ->string($client->getQueue($queueName))
+                    ->isEqualTo('queueUrl')
+                    ->mock($clientSqs)
+                        ->call('getQueueUrl')
+                            ->withArguments($params)
+                            ->once();
+
+        // Get queue error
+        $clientSqs->getMockController()->getQueueUrl = function() {
+            throw new SqsException();
+        };
+
+        $this
+            ->if($client = new Base($clientSqs))
+            ->and($queueName = 'error')
+                ->exception(
+                     function() use ($client, $queueName) {
+                        $client->getQueue($queueName);
+                     });
     }
 
     public function testCreateQueue()
@@ -39,8 +71,7 @@ class Client extends atoum
             ->and($queueName = 'name')
             ->and($queueAttr = ['key' => 'value'])
             ->and($params = ['QueueName' => $queueName, 'Attributes' => $queueAttr])
-                ->string($client->createQueue($queueName, $queueAttr))
-                    ->isEqualTo('queueUrl')
+                ->variable($client->createQueue($queueName, $queueAttr))
                     ->mock($clientSqs)
                         ->call('createQueue')
                             ->withArguments($params)
@@ -48,50 +79,16 @@ class Client extends atoum
 
         // Create error
         $clientSqs->getMockController()->createQueue = function() {
-            return null;
+            throw new SqsException();
         };
 
         $this
             ->if($client = new Base($clientSqs))
             ->and($queueName = 'name')
-                ->variable($client->createQueue($queueName))
-                    ->isNull();
-    }
-
-    public function testGetQueue()
-    {
-        // Get queue ok
-        $clientSqs = $this->getClientSqs();
-        $clientSqs->getMockController()->getQueueUrl = function() {
-            $model = new \mock\Guzzle\Service\Resource\Model();
-            $model->getMockController()->get = function() {
-                return "queueUrl";
-            };
-            return $model;
-        };
-
-        $this
-            ->if($client = new Base($clientSqs))
-            ->and($queueName = 'name')
-            ->and($params = ['QueueName' => $queueName])
-                ->string($client->getQueue($queueName))
-                    ->isEqualTo('queueUrl')
-                    ->mock($clientSqs)
-                        ->call('getQueueUrl')
-                            ->withArguments($params)
-                            ->once();
-
-        // Get queue error
-        $clientSqs = $this->getClientSqs();
-        $clientSqs->getMockController()->getQueueUrl = function() {
-            return null;
-        };
-
-        $this
-            ->if($client = new Base($clientSqs))
-            ->and($queueName = 'name')
-                ->variable($client->getQueue($queueName))
-                    ->isNull();
+                ->exception(
+                     function() use ($client, $queueName) {
+                        $client->createQueue($queueName);
+                     });
     }
 
     public function testDeleteQueue()
@@ -106,7 +103,7 @@ class Client extends atoum
         $this
             ->if($client = new Base($clientSqs))
             ->and($queueName = 'name')
-            ->and($params = ['QueueUrl' => $queueName])
+            ->and($params = ['QueueUrl' => 'queueUrl'])
                 ->boolean($client->deleteQueue($queueName))
                     ->isTrue()
                     ->mock($clientSqs)
@@ -145,7 +142,7 @@ class Client extends atoum
             ->and($delay = 1)
             ->and($messageAttr = ['key' => 'value'])
             ->and($params = [
-                'QueueUrl' => $queueName,
+                'QueueUrl' => 'queueUrl',
                 'MessageBody' => $message,
                 'DelaySeconds' => $delay,
                 'MessageAttributes' => $messageAttr
@@ -191,7 +188,7 @@ class Client extends atoum
             ->and($attributeNames = ['key' => 'value'])
             ->and($messageAttributeNames = ['key' => 'value'])
             ->and($params = [
-                'QueueUrl' => $queueName,
+                'QueueUrl' => 'queueUrl',
                 'MaxNumberOfMessages' => $maxNumberOfMessages,
                 'WaitTimeSeconds' => $waitTimeSeconds,
                 'VisibilityTimeout' => $visibilityTimeout,
@@ -238,7 +235,7 @@ class Client extends atoum
             ->and($queueName = 'name')
             ->and($receiveHandle = 'receiveHandleId')
             ->and($params = [
-                'QueueUrl' => $queueName,
+                'QueueUrl' => 'queueUrl',
                 'ReceiptHandle' => $receiveHandle,
                 ])
                 ->boolean($client->deleteMessage($queueName, $receiveHandle))
@@ -269,6 +266,14 @@ class Client extends atoum
             new \mock\Aws\Common\Signature\SignatureInterface(),
             new \mock\Guzzle\Common\Collection()
         );
+
+        $clientSqs->getMockController()->getQueueUrl = function() {
+            $model = new \mock\Guzzle\Service\Resource\Model();
+            $model->getMockController()->get = function() {
+                return "queueUrl";
+            };
+            return $model;
+        };
 
         return $clientSqs;
     }

@@ -4,6 +4,7 @@ namespace M6Web\Bundle\AwsBundle\Aws\Sqs;
 
 use Aws\Sqs\SqsClient;
 use Guzzle\Service\Resource\Model;
+use Aws\Sqs\Exception\SqsException;
 
 /**
  * Sqs Client
@@ -11,9 +12,15 @@ use Guzzle\Service\Resource\Model;
 class Client
 {
 /**
+     **
      * @var SqsClient
      */
     private $client;
+
+    /**
+     * @var Array
+     */
+    protected $queues;
 
     /**
      * __construct
@@ -36,7 +43,7 @@ class Client
     }
 
     /**
-     * Creates a new queue, or returns the URL of an existing one. When you request CreateQueue,
+     * Creates a new queue. When you request CreateQueue,
      * you provide a name for the queue. To successfully create a new queue,
      * you must provide a name that is unique within the scope of your own queues.
      *
@@ -46,20 +53,17 @@ class Client
      * @param string $name       The name for the queue to be created. Maximum 80 characters; alphanumeric characters, hyphens (-), and underscores (_) are allowed.
      * @param array  $attributes Associative array of <QueueAttributeName> keys mapping to (string) values. Each array key should be changed to an appropriate <QueueAttributeName>.
      *
-     * @return string|null
+     * @return void
+     * @throws SqsException
      */
-    public function createQueue($name, array $attributes = array())
+    public function createQueue($queueId, array $attributes = array())
     {
         $result = $this->client->createQueue([
-            'QueueName' => $name,
+            'QueueName' => $queueId,
             'Attributes' => $attributes
         ]);
 
-        if ($result instanceof Model) {
-            return $result->get('QueueUrl');
-        }
-
-        return null;
+        $this->queues[$queueId] = $result->get('QueueUrl');
     }
 
     /**
@@ -69,22 +73,22 @@ class Client
      * For more information, please see :
      * http://docs.aws.amazon.com/aws-sdk-php/latest/class-Aws.Sqs.SqsClient.html#_getQueueUrl
      *
-     * @param string $name The name of the queue whose URL must be fetched.
+     * @param string $queueId The name of the queue whose URL must be fetched.
      *
-     * @return string|null
+     * @return string
+     * @throws SqsException
      */
-    public function getQueue($name)
+    public function getQueue($queueId)
     {
-        $result = $this->client->getQueueUrl(['QueueName' => $name]);
-        if ($result instanceof Model) {
-            return $result->get('QueueUrl');
+        if (!isset($this->queues[$queueId])) {
+            $this->queues[$queueId] = $this->client->getQueueUrl(['QueueName' => $queueId])->get('QueueUrl');
         }
 
-        return null;
+        return $this->queues[$queueId];
     }
 
     /**
-     * Deletes the queue specified by the queue URL, regardless of whether the queue is empty.
+     * Deletes the queue specified by the queue name, regardless of whether the queue is empty.
      * If the specified queue does not exist, Amazon SQS returns a successful response.
      * Use DeleteQueue with care; once you delete your queue, any messages in the queue are no longer available.
      *
@@ -94,10 +98,11 @@ class Client
      * @param string $queue The URL of the Amazon SQS queue to take action on.
      *
      * @return boolean
+     * @throws SqsException
      */
-    public function deleteQueue($queue)
+    public function deleteQueue($queueId)
     {
-        $result = $this->client->deleteQueue(['QueueUrl' => $queue]);
+        $result = $this->client->deleteQueue(['QueueUrl' => $this->getQueue($queueId)]);
         if ($result instanceof Model) {
             return true;
         }
@@ -111,17 +116,18 @@ class Client
      * For more information, please see :
      * http://docs.aws.amazon.com/aws-sdk-php/latest/class-Aws.Sqs.SqsClient.html#_sendMessage
      *
-     * @param string  $queue             The URL of the Amazon SQS queue to take action on.
+     * @param string  $queueId           The name of the Amazon SQS queue to take action on.
      * @param string  $message           The message to send. String maximum 256 KB in size. For a list of allowed characters, see the preceding important note.
      * @param integer $delay             The number of seconds (0 to 900 - 15 minutes) to delay a specific message. Messages with a positive DelaySeconds value become available for processing after the delay time is finished. If you don't specify a value, the default value for the queue applies.
      * @param array   $messageAttributes Associative array of <String> keys mapping to (associative-array) values. Each array key should be changed to an appropriate <String>.
      *
      * @return string|null
+     * @throws SqsException
      */
-    public function sendMessage($queue, $message, $delay = 0, array $messageAttributes = array())
+    public function sendMessage($queueId, $message, $delay = 0, array $messageAttributes = array())
     {
         $args = [
-            'QueueUrl' => $queue,
+            'QueueUrl' => $this->getQueue($queueId),
             'MessageBody' => $message,
             'DelaySeconds' => $delay,
         ];
@@ -150,7 +156,7 @@ class Client
      * For more information, please see :
      * http://docs.aws.amazon.com/aws-sdk-php/latest/class-Aws.Sqs.SqsClient.html#_receiveMessage
      *
-     * @param string  $queue                 The URL of the Amazon SQS queue to take action on.
+     * @param string  $queueId               The name of the Amazon SQS queue to take action on.
      * @param integer $maxNumberOfMessages   The maximum number of messages to return. Amazon SQS never returns more messages than this value but may return fewer. All of the messages are not necessarily returned.
      * @param integer $waitTimeSeconds       The duration (in seconds) for which the call will wait for a message to arrive in the queue before returning. If a message is available, the call will return sooner than WaitTimeSeconds.
      * @param integer $visibilityTimeout     The duration (in seconds) that the received messages are hidden from subsequent retrieve requests after being retrieved by a ReceiveMessage request.
@@ -158,9 +164,10 @@ class Client
      * @param array   $messageAttributeNames A list of message attributes that need to be returned along with each message.
      *
      * @return Array|null
+     * @throws SqsException
      */
     public function receiveMessage(
-        $queue,
+        $queueId,
         $maxNumberOfMessages = 1,
         $waitTimeSeconds = 0,
         $visibilityTimeout = null,
@@ -169,7 +176,7 @@ class Client
     )
     {
         $args = [
-            'QueueUrl' => $queue,
+            'QueueUrl' => $this->getQueue($queueId),
             'MaxNumberOfMessages' => $maxNumberOfMessages,
             'WaitTimeSeconds' => $waitTimeSeconds
         ];
@@ -207,15 +214,16 @@ class Client
      * For more information, please see :
      * http://docs.aws.amazon.com/aws-sdk-php/latest/class-Aws.Sqs.SqsClient.html#_deleteMessage
      *
-     * @param string $queue         The URL of the Amazon SQS queue to take action on.
+     * @param string $queueId       The URL of the Amazon SQS queue to take action on.
      * @param string $receiveHandle The receipt handle associated with the message to delete.
      *
      * @return boolean
+     * @throws SqsException
      */
-    public function deleteMessage($queue, $receiveHandle)
+    public function deleteMessage($queueId, $receiveHandle)
     {
         $result = $this->client->deleteMessage([
-            'QueueUrl' => $queue,
+            'QueueUrl' => $this->getQueue($queueId),
             'ReceiptHandle' => $receiveHandle
         ]);
 
