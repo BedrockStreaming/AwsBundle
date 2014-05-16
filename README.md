@@ -36,11 +36,11 @@
 
     - `s3`:
         - `buckets`:
-            - `dev`: Name of the bucket (use from define service name)
+            - `dev`: Name of the bucket (use to define service name)
                 - `name`: "s3-bucket-name" Real name of the bucket
                 - `client`: "6cloud_cdn" Client name defined above
     - `sqs`:
-	- `dev`: Name of the sqs config (use from define service name)
+	- `dev`: Name of the sqs config (use to define service name)
 	    - `client`: "sqs_client" Client name defined above
 
 

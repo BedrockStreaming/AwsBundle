@@ -106,7 +106,7 @@ class Client extends atoum
         $this
             ->if($client = new Base($clientSqs))
             ->and($queueName = 'name')
-            ->and($params = ['QueueName' => $queueName])
+            ->and($params = ['QueueUrl' => $queueName])
                 ->boolean($client->deleteQueue($queueName))
                     ->isTrue()
                     ->mock($clientSqs)
