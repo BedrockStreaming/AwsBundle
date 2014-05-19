@@ -8,6 +8,7 @@ use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Symfony\Component\DependencyInjection\Loader;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * This is the class that loads and manages your bundle configuration
@@ -89,17 +90,34 @@ class M6WebAwsExtension extends Extension
      */
     protected function loadDynamoDb(ContainerBuilder $container, array $configs)
     {
-        $className  = $container->getParameter('m6web_aws.dynamodb.class');
+        $clientClassName = $container->getParameter('m6web_aws.dynamodb.client.class');
+        $proxyClassName  = $container->getParameter('m6web_aws.dynamodb.proxy.class');
 
         foreach ($configs as $name => $config) {
-            $clientName = sprintf('m6web_aws.%s', $config['client']);
-            $params     = array(
+            // AWS DynamoDb Client
+            $awsClientName = sprintf('m6web_aws.%s', $config['client']);
+            $params = [
+                'client' => new Reference($awsClientName)
+            ];
+
+            // M6 DynamoDb Client
+            $clientDefinition = new Definition($clientClassName, $params);
+            $clientName = sprintf('m6web_aws.dynamodbclient.%s', $name);
+            $container->setDefinition($clientName, $clientDefinition);
+
+            // M6 DynamoDb Client Proxy
+            $params = [
                 'client' => new Reference($clientName)
+            ];
+
+            $proxyDefinition = new Definition($proxyClassName, $params);
+            $proxyDefinition->setScope(ContainerInterface::SCOPE_CONTAINER);
+            $proxyDefinition->addMethodCall(
+                'setEventDispatcher',
+                [new Reference('event_dispatcher'), 'M6Web\Bundle\AwsBundle\Event\Command']
             );
 
-            $definition = new Definition($className, $params);
-
-            $container->setDefinition(sprintf('m6web_aws.dynamodb.%s', $name), $definition);
+            $container->setDefinition(sprintf('m6web_aws.dynamodb.%s', $name), $proxyDefinition);
         }
     }
 
