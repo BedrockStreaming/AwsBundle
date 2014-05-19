@@ -9,7 +9,7 @@
 **Reference guide of AWS configuration services**. 
  See [http://docs.aws.amazon.com/aws-sdk-php/guide/latest/configuration.html](AWS Configuration reference)
 
-- `m6web_aws`:
+- `m6_web_aws`:
     - `credentials`: # List of credentials accounts
         - `default`: Name of account
             - `key`: "azerty" [required] Your AWS access key ID. See [http://aws.amazon.com/fr/developers/access-keys/](AWS access keys)
@@ -42,6 +42,10 @@
     - `sqs`:
         - `dev`: Name of the sqs config (use to define service name)
             - `client`: "sqs_client" Client name defined above
+
+    - `dynamodb`:
+        - `dev`: Name of the client
+            - `client`: "6cloud_cdn" Client name defined above
 
 
 ### AWS Services Alias :

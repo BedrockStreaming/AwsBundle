@@ -40,12 +40,16 @@ class M6WebAwsExtension extends Extension
             $this->loadClient($container, $name, $client, $credentials);
         }
 
-        if (!empty($config['s3'])) {
+        if (array_key_exists('s3', $config)) {
             $this->loadS3($container, $config['s3']);
         }
 
         if (array_key_exists('sqs', $config)) {
             $this->loadSqs($container, $config['sqs']);
+        }
+
+        if (array_key_exists('dynamodb', $config)) {
+            $this->loadDynamoDb($container, $config['dynamodb']);
         }
     }
 
@@ -70,6 +74,10 @@ class M6WebAwsExtension extends Extension
             $params['region'] = $config['region'];
         }
 
+        if (!empty($config['base_url'])) {
+            $params['base_url'] = $config['base_url'];
+        }
+
         $definition = new Definition($className, $params);
 
         $definition
@@ -77,6 +85,45 @@ class M6WebAwsExtension extends Extension
                     ->setFactoryMethod('get');
 
         $container->setDefinition(sprintf('m6web_aws.%s', $name), $definition);
+    }
+
+    /**
+     * loadDynamoDb
+     *
+     * @param ContainerBuilder $container   Container
+     * @param array            $configs     Client config
+     */
+    protected function loadDynamoDb(ContainerBuilder $container, array $configs)
+    {
+        $clientClassName = $container->getParameter('m6web_aws.dynamodb.client.class');
+        $proxyClassName  = $container->getParameter('m6web_aws.dynamodb.proxy.class');
+
+        foreach ($configs as $name => $config) {
+            // AWS DynamoDb Client
+            $awsClientName = sprintf('m6web_aws.%s', $config['client']);
+            $params = [
+                'client' => new Reference($awsClientName)
+            ];
+
+            // M6 DynamoDb Client
+            $clientDefinition = new Definition($clientClassName, $params);
+            $clientName = sprintf('m6web_aws.dynamodbclient.%s', $name);
+            $container->setDefinition($clientName, $clientDefinition);
+
+            // M6 DynamoDb Client Proxy
+            $params = [
+                'client' => new Reference($clientName)
+            ];
+
+            $proxyDefinition = new Definition($proxyClassName, $params);
+            $proxyDefinition->setScope(ContainerInterface::SCOPE_CONTAINER);
+            $proxyDefinition->addMethodCall(
+                'setEventDispatcher',
+                [new Reference('event_dispatcher'), 'M6Web\Bundle\AwsBundle\Event\Command']
+            );
+
+            $container->setDefinition(sprintf('m6web_aws.dynamodb.%s', $name), $proxyDefinition);
+        }
     }
 
     /**
