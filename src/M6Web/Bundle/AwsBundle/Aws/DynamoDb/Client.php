@@ -4,6 +4,7 @@ namespace M6Web\Bundle\AwsBundle\Aws\DynamoDb;
 
 use Aws\DynamoDb\DynamoDbClient;
 use Aws\DynamoDb\Model\Attribute;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 
 /**
  * DynamoDb Client
@@ -37,6 +38,11 @@ class Client
     private $client;
 
     /**
+     * @var EventDispatcher
+     */
+    protected $eventDispatcher;
+
+    /**
      * __construct
      *
      * @param DynamoDbClient $client Aws DynamoDb Client
@@ -44,6 +50,16 @@ class Client
     public function __construct(DynamoDbClient $client)
     {
         $this->client = $client;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setEventDispatcher(EventDispatcher $eventDispatcher)
+    {
+        $this->eventDispatcher = $eventDispatcher;
+
+        return $this;
     }
 
     /**
