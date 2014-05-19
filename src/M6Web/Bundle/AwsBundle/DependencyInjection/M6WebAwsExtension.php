@@ -23,7 +23,7 @@ class M6WebAwsExtension extends Extension
     public function load(array $configs, ContainerBuilder $container)
     {
         $configuration = new Configuration();
-        $config = $this->processConfiguration($configuration, $configs);
+        $config        = $this->processConfiguration($configuration, $configs);
 
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('services.yml');
@@ -40,7 +40,7 @@ class M6WebAwsExtension extends Extension
             $this->loadClient($container, $name, $client, $credentials);
         }
 
-        if(!empty($config['s3'])){
+        if (!empty($config['s3'])) {
             $this->loadS3($container, $config['s3']);
         }
 
@@ -82,8 +82,8 @@ class M6WebAwsExtension extends Extension
     /**
      * loadSqs
      *
-     * @param ContainerBuilder $container   Container
-     * @param array            $configs     Client config
+     * @param ContainerBuilder $container Container
+     * @param array            $configs   Client config
      */
     protected function loadSqs(ContainerBuilder $container, array $configs)
     {
@@ -99,13 +99,14 @@ class M6WebAwsExtension extends Extension
 
             // M6 Sqs Client
             $clientDefinition = new Definition($clientClassName, $params);
-            $clientName = sprintf('m6web_aws.sqsclient.%s', $name);
+            $clientName       = sprintf('m6web_aws.sqsclient.%s', $name);
             $container->setDefinition($clientName, $clientDefinition);
 
             // M6 Proxy Sqs Client
             $params = array(
                 'client' => new Reference($clientName)
             );
+
             $proxyDefinition = new Definition($proxyClassName, $params);
             $proxyDefinition->setScope(ContainerInterface::SCOPE_CONTAINER);
             $proxyDefinition->addMethodCall(
@@ -119,8 +120,8 @@ class M6WebAwsExtension extends Extension
     /**
      * loadS3
      *
-     * @param ContainerBuilder $container   Container
-     * @param array            $configs     Client config
+     * @param ContainerBuilder $container Container
+     * @param array            $configs   Client config
      */
     protected function loadS3(ContainerBuilder $container, array $configs)
     {
@@ -136,7 +137,7 @@ class M6WebAwsExtension extends Extension
      *
      * @param ContainerBuilder $container Container
      * @param string           $name      Service name
-     * @param array            $configs   Client config
+     * @param array            $config    Client config
      */
     protected function loadBucket(ContainerBuilder $container, $name, $config)
     {

@@ -112,5 +112,5 @@
 
 ```
     composer install
-    ./vendor/bin/atoum -d src/M6Web/Bundle/AwsBundle/Tests
+    ./bin/atoum
 ```

@@ -21,11 +21,13 @@ class DataCollector extends SymfonyDataCollector
     protected $name;
 
     /**
+     * @param string $name
+     *
      * Construct the data collector
      */
     public function __construct($name)
     {
-        $this->name = $name;
+        $this->name             = $name;
         $this->data['commands'] = array();
     }
 

@@ -21,7 +21,7 @@ class ClientFactory
      * __construct
      *
      * @param string $factoryClass Factory class name
-     * @param array $aliasKeys Alias key list
+     * @param array  $aliasKeys    key list
      */
     public function __construct($factoryClass, array $aliasKeys = array())
     {
@@ -80,7 +80,7 @@ class ClientFactory
      * get
      *
      * @param string $service Aws Service alias
-     * @param array $config   Base config client
+     * @param array  $config  Base config client
      *
      * @return AwsClient
      */

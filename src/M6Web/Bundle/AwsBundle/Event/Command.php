@@ -8,7 +8,7 @@ use M6Web\Bundle\AwsBundle\Event\Dispatchable;
 /**
  * Command Event
  */
-class Command extends SymfonyEvent implements Dispatchable
+class Command extends SymfonyEvent implements DispatcherInterface
 {
     /**
      * @var integer

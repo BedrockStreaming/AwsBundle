@@ -6,7 +6,7 @@ namespace M6Web\Bundle\AwsBundle\Event;
 /**
  * Dispatcher interface
  */
-interface Dispatchable
+interface DispatcherInterface
 {
     /**
      * Set the sqs command associated with this event

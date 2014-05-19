@@ -50,7 +50,7 @@ class Client
      * For more information, please see :
      * http://docs.aws.amazon.com/aws-sdk-php/latest/class-Aws.Sqs.SqsClient.html#_createQueue
      *
-     * @param string $name       The name for the queue to be created. Maximum 80 characters; alphanumeric characters, hyphens (-), and underscores (_) are allowed.
+     * @param string $queueId    The name for the queue to be created. Maximum 80 characters; alphanumeric characters, hyphens (-), and underscores (_) are allowed.
      * @param array  $attributes Associative array of <QueueAttributeName> keys mapping to (string) values. Each array key should be changed to an appropriate <QueueAttributeName>.
      *
      * @return void
@@ -95,7 +95,7 @@ class Client
      * For more information, please see :
      * http://docs.aws.amazon.com/aws-sdk-php/latest/class-Aws.Sqs.SqsClient.html#_deleteQueue
      *
-     * @param string $queue The URL of the Amazon SQS queue to take action on.
+     * @param string $queueId The URL of the Amazon SQS queue to take action on.
      *
      * @return boolean
      * @throws SqsException

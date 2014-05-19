@@ -89,7 +89,7 @@ class Proxy
         }
 
         $class = new \ReflectionClass($eventClass);
-        if (!$class->implementsInterface('\M6Web\Bundle\AwsBundle\Event\Dispatchable')) {
+        if (!$class->implementsInterface('\M6Web\Bundle\AwsBundle\Event\DispatcherInterface')) {
             throw new Exception("The Event class : ".$eventClass." must implement Dispatchable");
         }
 
