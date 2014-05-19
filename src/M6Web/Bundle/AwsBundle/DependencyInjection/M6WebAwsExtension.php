@@ -27,6 +27,7 @@ class M6WebAwsExtension extends Extension
 
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('services.yml');
+        $loader->load('data_collector.yml');
 
         if (!empty($config['aws_factory_class'])) {
             $container->setParameter('m6web_aws.aws_factory.class', $config['aws_factory_class']);
