@@ -11,9 +11,9 @@ use Aws\Sqs\Exception\SqsException;
  */
 class Client
 {
-/**
+    /**
      **
-     * @var SqsClient
+     * @var Manager
      */
     private $client;
 
@@ -27,9 +27,9 @@ class Client
      *
      * @param SqsClient $client Aws SqsClient Client
      */
-    public function __construct(SqsClient $client)
+    public function __construct(SqsClient $client, $proxyClass = 'M6Web\Bundle\AwsBundle\Aws\Sqs\Proxy')
     {
-        $this->client = $client;
+        $this->client = new $proxyClass($client);
     }
 
     /**
@@ -39,7 +39,7 @@ class Client
      */
     public function getClient()
     {
-        return $this->client;
+        return $this->client->getClient();
     }
 
     /**

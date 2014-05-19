@@ -8,6 +8,7 @@ use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Symfony\Component\DependencyInjection\Loader;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * This is the class that loads and manages your bundle configuration
@@ -94,6 +95,11 @@ class M6WebAwsExtension extends Extension
             );
 
             $definition = new Definition($className, $params);
+            $definition->setScope(ContainerInterface::SCOPE_CONTAINER);
+            $definition->addMethodCall(
+                'setEventDispatcher',
+                [new Reference('event_dispatcher'), 'M6Web\Bundle\AwsBundle\Aws\Sqs\SqsEvent']
+            );
 
             $container->setDefinition(sprintf('m6web_aws.sqs.%s', $name), $definition);
         }

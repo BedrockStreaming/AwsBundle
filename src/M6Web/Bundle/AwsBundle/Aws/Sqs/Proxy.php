@@ -1,0 +1,124 @@
+<?php
+
+namespace M6Web\Bundle\AwsBundle\Aws\Sqs;
+
+use Aws\Sqs\SqsClient;
+use Aws\Sqs\Exception\SqsException;
+
+/**
+ * Sqs Proxy Client
+ */
+class Proxy
+{
+    /**
+     **
+     * @var SqsClient
+     */
+    private $client;
+
+    /**
+     * event dispatcher
+     * @var Object
+     */
+    protected $eventDispatcher = null;
+
+    /**
+     * class of the event notifier
+     * @var string
+     */
+    protected $eventClass = null;
+
+    /**
+     * __construct
+     *
+     * @param SqsClient $client Aws SqsClient Client
+     */
+    public function __construct(SqsClient $client)
+    {
+        $this->client = $client;
+    }
+
+    /**
+     * Direct access to the SqsClient client
+     *
+     * @return SqsClient
+     */
+    public function getClient()
+    {
+        return $this->client;
+    }
+
+    /**
+     * Notify an event to the event dispatcher
+     *
+     * @param string $command   The command name
+     * @param array  $arguments args of the command
+     * @param int    $time      exec time
+     *
+     * @return void
+     */
+    public function notifyEvent($command, $arguments, $time = 0)
+    {
+        if ($this->eventDispatcher) {
+            $className = $this->eventClass;
+
+            $event = new $className();
+            $event->setCommand($command);
+            $event->setExecutionTime($time);
+            $event->setArguments($arguments);
+
+            $this->eventDispatcher->dispatch('sqs.command', $event);
+        }
+    }
+
+    /**
+     * Set an event dispatcher to notify redis command
+     *
+     * @param Object $eventDispatcher The eventDispatcher object, which implement the notify method
+     * @param string $eventClass      The event class used to create an event and send it to the event dispatcher
+     *
+     * @return void
+     *
+     */
+    public function setEventDispatcher($eventDispatcher, $eventClass)
+    {
+        if (!is_object($eventDispatcher) || !method_exists($eventDispatcher, 'dispatch')) {
+            throw new Exception("The EventDispatcher must be an object and implement a dispatch method");
+        }
+
+        if (!class_exists($eventClass) ||
+            !method_exists($eventClass, 'setCommand') ||
+            !method_exists($eventClass, 'setArguments') ||
+            !method_exists($eventClass, 'setExecutionTime')) {
+            throw new Exception("The Event class : ".$eventClass." must implement the setCommand, setExecutionTime and the setArguments method");
+        }
+
+        $this->eventDispatcher = $eventDispatcher;
+        $this->eventClass      = $eventClass;
+    }
+
+    /**
+     *  magic method to the Sqs client
+     *
+     * @param string $name      method name
+     * @param array  $arguments method arguments
+     *
+     * @return mixed
+     */
+    public function __call($name, $arguments)
+    {
+        if ($sqs = $this->getClient()) {
+            $start = microtime(true);
+            try {
+                $ret = call_user_func_array(array($sqs, $name), $arguments);
+                $this->notifyEvent($name, $arguments, microtime(true) - $start);
+
+                return $ret;
+            } catch (SqsException $e) {
+                throw new Exception("Error calling the method ".$name." : ".$e->getMessage());
+            }
+        } else {
+            throw new Exception("Cant connect to Sqs");
+        }
+    }
+}
