@@ -86,22 +86,32 @@ class M6WebAwsExtension extends Extension
      */
     protected function loadSqs(ContainerBuilder $container, array $configs)
     {
-        $className  = $container->getParameter('m6web_aws.sqs.class');
+        $clientClassName = $container->getParameter('m6web_aws.sqs.client.class');
+        $proxyClassName  = $container->getParameter('m6web_aws.sqs.proxy.class');
 
         foreach ($configs as $name => $config) {
-            $clientName = sprintf('m6web_aws.%s', $config['client']);
-            $params     = array(
+            // Aws Sqs Client
+            $awsClientName = sprintf('m6web_aws.%s', $config['client']);
+            $params        = array(
+                'client' => new Reference($awsClientName)
+            );
+
+            // M6 Sqs Client
+            $clientDefinition = new Definition($clientClassName, $params);
+            $clientName = sprintf('m6web_aws.sqsclient.%s', $name);
+            $container->setDefinition($clientName, $clientDefinition);
+
+            // M6 Proxy Sqs Client
+            $params = array(
                 'client' => new Reference($clientName)
             );
-
-            $definition = new Definition($className, $params);
-            $definition->setScope(ContainerInterface::SCOPE_CONTAINER);
-            $definition->addMethodCall(
+            $proxyDefinition = new Definition($proxyClassName, $params);
+            $proxyDefinition->setScope(ContainerInterface::SCOPE_CONTAINER);
+            $proxyDefinition->addMethodCall(
                 'setEventDispatcher',
-                [new Reference('event_dispatcher'), 'M6Web\Bundle\AwsBundle\Aws\Sqs\SqsEvent']
+                [new Reference('event_dispatcher'), 'M6Web\Bundle\AwsBundle\Event\Command']
             );
-
-            $container->setDefinition(sprintf('m6web_aws.sqs.%s', $name), $definition);
+            $container->setDefinition(sprintf('m6web_aws.sqs.%s', $name), $proxyDefinition);
         }
     }
 

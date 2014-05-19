@@ -1,21 +1,33 @@
 <?php
 
-namespace M6Web\Bundle\AwsBundle\Aws\Sqs;
+namespace M6Web\Bundle\AwsBundle\Event;
 
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Component\EventDispatcher\Event as SymfonyEvent;
+use M6Web\Bundle\AwsBundle\Event\Dispatchable;
 
 /**
- * Sqs event
+ * Command Event
  */
-class SqsEvent extends Event
+class Command extends SymfonyEvent implements Dispatchable
 {
-    private $executionTime = 0;
-    private $command;
-    private $arguments;
+    /**
+     * @var integer
+     */
+    protected $executionTime = 0;
 
     /**
-     * Set the sqs command associated with this event
-     * @param string $command The sqs command
+     * @var string
+     */
+    protected $command;
+
+    /**
+     * @var array
+     */
+    protected $arguments;
+
+    /**
+     * Set the command associated with this event
+     * @param string $command The command
      */
     public function setCommand($command)
     {
@@ -23,8 +35,8 @@ class SqsEvent extends Event
     }
 
     /**
-     * Get the sqs command associated with this event
-     * @return string the sqs command
+     * Get the command associated with this event
+     * @return string the command
      */
     public function getCommand()
     {

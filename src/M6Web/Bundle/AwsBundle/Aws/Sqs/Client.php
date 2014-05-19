@@ -2,12 +2,12 @@
 
 namespace M6Web\Bundle\AwsBundle\Aws\Sqs;
 
-use Aws\Sqs\SqsClient;
 use Guzzle\Service\Resource\Model;
 use Aws\Sqs\Exception\SqsException;
+use Aws\Sqs\SqsClient;
 
 /**
- * Sqs Client
+ * Client
  */
 class Client
 {
@@ -25,11 +25,11 @@ class Client
     /**
      * __construct
      *
-     * @param SqsClient $client Aws SqsClient Client
+     * @param SqsClient $client Client Client
      */
-    public function __construct(SqsClient $client, $proxyClass = 'M6Web\Bundle\AwsBundle\Aws\Sqs\Proxy')
+    public function __construct(SqsClient $client)
     {
-        $this->client = new $proxyClass($client);
+        $this->client = $client;
     }
 
     /**
@@ -39,7 +39,7 @@ class Client
      */
     public function getClient()
     {
-        return $this->client->getClient();
+        return $this->client;
     }
 
     /**

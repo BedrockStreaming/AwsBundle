@@ -2,8 +2,8 @@
 
 namespace M6Web\Bundle\AwsBundle\Aws\Sqs;
 
-use Aws\Sqs\SqsClient;
 use Aws\Sqs\Exception\SqsException;
+use M6Web\Bundle\AwsBundle\Event\Dispatchable;
 
 /**
  * Sqs Proxy Client
@@ -12,18 +12,20 @@ class Proxy
 {
     /**
      **
-     * @var SqsClient
+     * @var Client
      */
     private $client;
 
     /**
-     * event dispatcher
+     * Event dispatcher
+     *
      * @var Object
      */
     protected $eventDispatcher = null;
 
     /**
-     * class of the event notifier
+     * Class of the event notifier
+     *
      * @var string
      */
     protected $eventClass = null;
@@ -31,17 +33,17 @@ class Proxy
     /**
      * __construct
      *
-     * @param SqsClient $client Aws SqsClient Client
+     * @param Client $client AwsBundle Client
      */
-    public function __construct(SqsClient $client)
+    public function __construct(Client $client)
     {
         $this->client = $client;
     }
 
     /**
-     * Direct access to the SqsClient client
+     * Direct access to the client
      *
-     * @return SqsClient
+     * @return Client
      */
     public function getClient()
     {
@@ -86,11 +88,9 @@ class Proxy
             throw new Exception("The EventDispatcher must be an object and implement a dispatch method");
         }
 
-        if (!class_exists($eventClass) ||
-            !method_exists($eventClass, 'setCommand') ||
-            !method_exists($eventClass, 'setArguments') ||
-            !method_exists($eventClass, 'setExecutionTime')) {
-            throw new Exception("The Event class : ".$eventClass." must implement the setCommand, setExecutionTime and the setArguments method");
+        $class = new \ReflectionClass($eventClass);
+        if (!$class->implementsInterface('\M6Web\Bundle\AwsBundle\Event\Dispatchable')) {
+            throw new Exception("The Event class : ".$eventClass." must implement Dispatchable");
         }
 
         $this->eventDispatcher = $eventDispatcher;
@@ -98,7 +98,7 @@ class Proxy
     }
 
     /**
-     *  magic method to the Sqs client
+     *  Magic method to the Sqs client
      *
      * @param string $name      method name
      * @param array  $arguments method arguments
