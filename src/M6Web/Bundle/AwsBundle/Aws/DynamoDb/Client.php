@@ -35,12 +35,22 @@ class Client
     /**
      * @var DynamoDbClient
      */
-    private $client;
+    protected $client;
 
     /**
      * @var EventDispatcher
      */
     protected $eventDispatcher;
+
+    /**
+     * @var CacheInterface
+     */
+    protected $cacheService = null;
+
+    /**
+     * @var string
+     */
+    protected $cacheKeyPrefix = 'm6_dynamodb_client';
 
     /**
      * __construct
@@ -58,6 +68,25 @@ class Client
     public function setEventDispatcher(EventDispatcher $eventDispatcher)
     {
         $this->eventDispatcher = $eventDispatcher;
+
+        return $this;
+    }
+
+    /**
+     * Sets the cache service used by dynamoDb
+     * 
+     * @param CacheInterface $cacheService
+     * @param string         $cacheKeyPrefix
+     *
+     * @return Client
+     */
+    public function setCache(CacheInterface $cacheService, $cacheKeyPrefix = null)
+    {
+        $this->cacheService   = $cacheService;
+
+        if (is_string($cacheKeyPrefix)) {
+            $this->cacheKeyPrefix = $cacheKeyPrefix;
+        }
 
         return $this;
     }
@@ -115,11 +144,11 @@ class Client
     /**
      * Convenience method for instantiating and registering the DynamoDB Session handler with this DynamoDB client object.
      * 
-     * @see http://docs.aws.amazon.com/aws-sdk-php/latest/class-Aws.DynamoDb.Session.SessionHandler.html#_factory
-     * 
      * @param array $config Array of options for the session handler factory
      * 
      * @return Aws\DynamoDb\Session\SessionHandler
+     *
+     * @see http://docs.aws.amazon.com/aws-sdk-php/latest/class-Aws.DynamoDb.Session.SessionHandler.html#_factory
      */
     public function registerSessionHandler(array $config = [])
     {
@@ -129,33 +158,50 @@ class Client
     /**
      * Executes the BatchGetItem operation.
      *
-     * @see http://docs.aws.amazon.com/aws-sdk-php/latest/class-Aws.DynamoDb.DynamoDbClient.html#_batchGetItem
-     *
      * @param array  $requestItems           Associative array of <TableName> keys mapping to (associative-array) values.
      * @param string $returnConsumedCapacity Sets consumed capacity return mode.
      * 
      * @return Guzzle\Service\Resource\Model
+     *
+     * @see http://docs.aws.amazon.com/aws-sdk-php/latest/class-Aws.DynamoDb.DynamoDbClient.html#_batchGetItem
      */
     public function batchGetItem(array $requestItems, $returnConsumedCapacity = self::CAPACITY_NONE)
     {
-        return $this->client->batchGetItem(
-            [
-                'RequestItems'           => $requestItems,
-                'ReturnConsumedCapacity' => $returnConsumedCapacity
-            ]
-        );
+        $args = [
+            'RequestItems'           => $requestItems,
+            'ReturnConsumedCapacity' => $returnConsumedCapacity
+        ];
+
+        // Try to load from cache is a cacheService is available
+        if ($this->cacheService !== null) {
+            $cacheKey = $this->generateCacheKey($args);
+
+            if ($this->cacheService->has($cacheKey)) {
+                return $this->cacheService->get($cacheKey);
+            }
+        }
+
+        // Sends batchGetItem command to AWS
+        $result = $this->client->batchGetItem($args);
+
+        // Saves to cache
+        if ($this->cacheService !== null) {
+            $this->cacheService->set($cacheKey, $result);
+        }
+
+        return $result;
     }
 
     /**
      * Executes the BatchWriteItem operation.
      *
-     * @see http://docs.aws.amazon.com/aws-sdk-php/latest/class-Aws.DynamoDb.DynamoDbClient.html#_batchWriteItem
-     * 
      * @param array  $requestItems                Associative array of <TableName> keys mapping to (array<associative-array>) values.
      * @param string $returnConsumedCapacity      Sets consumed capacity return mode.
      * @param string $returnItemCollectionMetrics If set to SIZE, statistics about item collections, if any, that were modified during the operation are returned in the response.
      * 
      * @return Guzzle\Service\Resource\Model
+     *
+     * @see http://docs.aws.amazon.com/aws-sdk-php/latest/class-Aws.DynamoDb.DynamoDbClient.html#_batchWriteItem
      */
     public function batchWriteItem(array $requestItems, $returnConsumedCapacity = self::CAPACITY_NONE, $returnItemCollectionMetrics = self::METRICS_NONE)
     {
@@ -171,8 +217,6 @@ class Client
     /**
      * Executes the CreateTable operation.
      *
-     * @see http://docs.aws.amazon.com/aws-sdk-php/latest/class-Aws.DynamoDb.DynamoDbClient.html#_createTable
-     *
      * @param string $tableName              The name of the table to create.
      * @param array  $attributeDefinitions   An array of attributes that describe the key schema for the table and indexes.
      * @param array  $keySchema              Specifies the attributes that make up the primary key for a table or an index
@@ -181,6 +225,8 @@ class Client
      * @param array  $globalSecondaryIndexes One or more global secondary indexes (the maximum is five) to be created on the table.
      * 
      * @return Guzzle\Service\Resource\Model
+     *
+     * @see http://docs.aws.amazon.com/aws-sdk-php/latest/class-Aws.DynamoDb.DynamoDbClient.html#_createTable
      */
     public function createTable($tableName, array $attributeDefinitions, array $keySchema, array $provisionedThroughput, array $localSecondaryIndexes = null, array $globalSecondaryIndexes = null)
     {
@@ -204,8 +250,6 @@ class Client
 
     /**
      * Executes the DeleteItem operation.
-     *
-     * @see http://docs.aws.amazon.com/aws-sdk-php/latest/class-Aws.DynamoDb.DynamoDbClient.html#_deleteItem
      * 
      * @param string $tableName                   The name of the table from which to delete the item.
      * @param array  $key                         Associative array of <AttributeName> keys mapping to (associative-array) values.
@@ -216,6 +260,8 @@ class Client
      * @param string $returnItemCollectionMetrics If set to SIZE, statistics about item collections, if any, that were modified during the operation are returned in the response.
      * 
      * @return Guzzle\Service\Resource\Model
+     *
+     * @see http://docs.aws.amazon.com/aws-sdk-php/latest/class-Aws.DynamoDb.DynamoDbClient.html#_deleteItem
      */
     public function deleteItem($tableName, array $key, array $expected = null, $conditionnalOperator = self::COND_AND, $returnValues = self::RETURN_NONE, $returnConsumedCapacity = self::CAPACITY_NONE, $returnItemCollectionMetrics = self::METRICS_NONE)
     {
@@ -238,11 +284,11 @@ class Client
     /**
      * Executes the DeleteTable operation.
      *
-     * @see http://docs.aws.amazon.com/aws-sdk-php/latest/class-Aws.DynamoDb.DynamoDbClient.html#_deleteTable
-     * 
      * @param string $tableName Name of the table to delete
      * 
      * @return Guzzle\Service\Resource\Model
+     *
+     * @see http://docs.aws.amazon.com/aws-sdk-php/latest/class-Aws.DynamoDb.DynamoDbClient.html#_deleteTable
      */
     public function deleteTable($tableName)
     {
@@ -253,11 +299,11 @@ class Client
      * Returns information about the table, including the current status of the table,
      * when it was created, the primary key schema, and any indexes on the table.
      *
-     * @see http://docs.aws.amazon.com/aws-sdk-php/latest/class-Aws.DynamoDb.DynamoDbClient.html#_describeTable
-     *
      * @param string $tableName Name of the table to describe
      * 
      * @return Guzzle\Service\Resource\Model
+     *
+     * @see http://docs.aws.amazon.com/aws-sdk-php/latest/class-Aws.DynamoDb.DynamoDbClient.html#_describeTable
      */
     public function describeTable($tableName)
     {
@@ -267,8 +313,6 @@ class Client
     /**
      * The GetItem operation returns a set of attributes for the item with the given primary key.
      * If there is no matching item, GetItem does not return any data.
-     *
-     * @see http://docs.aws.amazon.com/aws-sdk-php/latest/class-Aws.DynamoDb.DynamoDbClient.html#_getItem
      * 
      * @param string  $tableName              The name of the table containing the requested item.
      * @param array   $key                    Associative array of <AttributeName> keys mapping to (associative-array) values.
@@ -277,6 +321,8 @@ class Client
      * @param string  $returnConsumedCapacity Sets consumed capacity return mode.
      * 
      * @return Guzzle\Service\Resource\Model
+     *
+     * @see http://docs.aws.amazon.com/aws-sdk-php/latest/class-Aws.DynamoDb.DynamoDbClient.html#_getItem
      */
     public function getItem($tableName, array $key, array $attributesToGet = null, $consistentRead = false, $returnConsumedCapacity = self::CAPACITY_NONE)
     {
@@ -290,19 +336,36 @@ class Client
         if ($attributesToGet !== null) {
             $args['AttributesToGet'] = $attributesToGet;
         }
-        
-        return $this->client->getItem($args);
+
+        // Try to load from cache is a cacheService is available
+        if ($this->cacheService !== null) {
+            $cacheKey = $this->generateCacheKey($args);
+
+            if ($this->cacheService->has($cacheKey)) {
+                return $this->cacheService->get($cacheKey);
+            }
+        }
+
+        // Sends getItem command to AWS
+        $result = $this->client->getItem($args);
+
+        // Saves to cache
+        if ($this->cacheService !== null) {
+            $this->cacheService->set($cacheKey, $result);
+        }
+
+        return $result;
     }
 
     /**
      * Returns an array of all the tables associated with the current account and endpoint.
-     * 
-     * @see http://docs.aws.amazon.com/aws-sdk-php/latest/class-Aws.DynamoDb.DynamoDbClient.html#_listTables
      *
      * @param string  $exclusiveStartTableName Name of the table that starts the list.
      * @param integer $limit                   A maximum number of tables to return.
      * 
      * @return  Guzzle\Service\Resource\Model
+     * 
+     * @see http://docs.aws.amazon.com/aws-sdk-php/latest/class-Aws.DynamoDb.DynamoDbClient.html#_listTables
      */
     public function listTables($exclusiveStartTableName = null, $limit = null)
     {
@@ -335,8 +398,6 @@ class Client
 
     /**
      * Creates a new item, or replaces an old item with a new item. 
-     * 
-     * @see http://docs.aws.amazon.com/aws-sdk-php/latest/class-Aws.DynamoDb.DynamoDbClient.html#_putItem
      *
      * @param string $tableName                   The name of the table to contain the item.
      * @param array  $item                        Associative array of <AttributeName> keys mapping to (associative-array) values.
@@ -347,6 +408,8 @@ class Client
      * @param string $returnItemCollectionMetrics If set to SIZE, statistics about item collections, if any, that were modified during the operation are returned in the response.
      * 
      * @return Guzzle\Service\Resource\Model
+     *
+     * @see http://docs.aws.amazon.com/aws-sdk-php/latest/class-Aws.DynamoDb.DynamoDbClient.html#_putItem
      */
     public function putItem($tableName, array $item, array $expected = null, $conditionnalOperator = self::COND_AND, $returnValues = self::RETURN_NONE, $returnConsumedCapacity = self::CAPACITY_NONE, $returnItemCollectionMetrics = self::METRICS_NONE)
     {
@@ -369,12 +432,12 @@ class Client
     /**
      * Executes the Query operation.
      * 
-     * @see http://docs.aws.amazon.com/aws-sdk-php/latest/class-Aws.DynamoDb.DynamoDbClient.html#_query
-     * 
      * @param string $tableName The name of the table containing the requested items.
      * @param array  $args      Arguments of the query
      * 
      * @return  Guzzle\Service\Resource\Model
+     *
+     * @see http://docs.aws.amazon.com/aws-sdk-php/latest/class-Aws.DynamoDb.DynamoDbClient.html#_query
      */
     public function query($tableName, array $args)
     {
@@ -386,12 +449,12 @@ class Client
     /**
      * Executes the Scan operation.
      * 
-     * @see http://docs.aws.amazon.com/aws-sdk-php/latest/class-Aws.DynamoDb.DynamoDbClient.html#_scan
-     * 
      * @param string $tableName The name of the table containing the requested items.
      * @param array  $args      Arguments of the query
      * 
      * @return  Guzzle\Service\Resource\Model
+     *
+     * @see http://docs.aws.amazon.com/aws-sdk-php/latest/class-Aws.DynamoDb.DynamoDbClient.html#_scan
      */
     public function scan($tableName, array $args)
     {
@@ -404,8 +467,6 @@ class Client
      * Edits an existing item's attributes, or inserts a new item if it does not already exist. 
      * You can put, delete, or add attribute values. 
      * You can also perform a conditional update (insert a new attribute name-value pair if it doesn't exist, or replace an existing name-value pair if it has certain expected attribute values).
-     *
-     * @see http://docs.aws.amazon.com/aws-sdk-php/latest/class-Aws.DynamoDb.DynamoDbClient.html#_updateItem
      * 
      * @param string $tableName                   The name of the table containing the item to update.
      * @param array  $key                         Associative array of <AttributeName> keys mapping to (associative-array) values.
@@ -417,6 +478,8 @@ class Client
      * @param string $returnItemCollectionMetrics If set to SIZE, statistics about item collections, if any, that were modified during the operation are returned in the response.
      * 
      * @return Guzzle\Service\Resource\Model
+     *
+     * @see http://docs.aws.amazon.com/aws-sdk-php/latest/class-Aws.DynamoDb.DynamoDbClient.html#_updateItem
      */
     public function updateItem($tableName, array $key, array $attributeUpdates = null, array $expected = null, $conditionnalOperator = self::COND_AND, $returnValues = self::RETURN_NONE, $returnConsumedCapacity = self::CAPACITY_NONE, $returnItemCollectionMetrics = self::METRICS_NONE)
     {
@@ -443,13 +506,13 @@ class Client
     /**
      * Executes the UpdateTable operation.
      *
-     * @see http://docs.aws.amazon.com/aws-sdk-php/latest/class-Aws.DynamoDb.DynamoDbClient.html#_updateTable
-     *
      * @param string $tableName              The name of the table to be updated.
      * @param array  $provisionedThroughput  Represents the provisioned throughput settings for a specified table or index.
      * @param array  $globalSecondaryIndexes An array of one or more global secondary indexes on the table, together with provisioned throughput settings for each index.
      * 
      * @return Guzzle\Service\Resource\Model
+     *
+     * @see http://docs.aws.amazon.com/aws-sdk-php/latest/class-Aws.DynamoDb.DynamoDbClient.html#_updateTable
      */
     public function updateTable($tableName, array $provisionedThroughput = null, array $globalSecondaryIndexes = null)
     {
@@ -495,12 +558,12 @@ class Client
     /**
      * Executes the GetBatchGetItemIterator operation.
      *
-     * @see http://docs.aws.amazon.com/aws-sdk-php/latest/class-Aws.DynamoDb.DynamoDbClient.html#_getBatchGetItemIterator
-     *
      * @param array  $requestItems           Associative array of <TableName> keys mapping to (associative-array) values.
      * @param string $returnConsumedCapacity Sets consumed capacity return mode.
      * 
      * @return  Guzzle\Service\Resource\ResourceIteratorInterface
+     *
+     * @see http://docs.aws.amazon.com/aws-sdk-php/latest/class-Aws.DynamoDb.DynamoDbClient.html#_getBatchGetItemIterator
      */
     public function getBatchGetItemIterator(array $requestItems, $returnConsumedCapacity = self::CAPACITY_NONE)
     {
@@ -514,13 +577,13 @@ class Client
 
     /**
      * Returns an interator on the tables associated with the current account and endpoint.
-     * 
-     * @see http://docs.aws.amazon.com/aws-sdk-php/latest/class-Aws.DynamoDb.DynamoDbClient.html#_getListTablesIterator
      *
      * @param string  $exclusiveStartTableName Name of the table that starts the list.
      * @param integer $limit                   A maximum number of tables to return.
      * 
      * @return   Guzzle\Service\Resource\ResourceIteratorInterface
+     *
+     * @see http://docs.aws.amazon.com/aws-sdk-php/latest/class-Aws.DynamoDb.DynamoDbClient.html#_getListTablesIterator
      */
     public function getListTablesIterator($exclusiveStartTableName = null, $limit = null)
     {
@@ -540,12 +603,12 @@ class Client
     /**
      * Executes the GetQueryIterator operation.
      * 
-     * @see http://docs.aws.amazon.com/aws-sdk-php/latest/class-Aws.DynamoDb.DynamoDbClient.html#_getQueryIterator
-     * 
      * @param string $tableName The name of the table containing the requested items.
      * @param array  $args      Arguments of the query
      * 
      * @return  Guzzle\Service\Resource\ResourceIteratorInterface
+     *
+     * @see http://docs.aws.amazon.com/aws-sdk-php/latest/class-Aws.DynamoDb.DynamoDbClient.html#_getQueryIterator
      */
     public function getQueryIterator($tableName, array $args)
     {
@@ -557,17 +620,64 @@ class Client
     /**
      * Executes the GetScanIterator operation.
      * 
-     * @see http://docs.aws.amazon.com/aws-sdk-php/latest/class-Aws.DynamoDb.DynamoDbClient.html#_getScanIterator
-     * 
      * @param string $tableName The name of the table containing the requested items.
      * @param array  $args      Arguments of the query
      * 
      * @return Guzzle\Service\Resource\ResourceIteratorInterface
+     *
+     * @see http://docs.aws.amazon.com/aws-sdk-php/latest/class-Aws.DynamoDb.DynamoDbClient.html#_getScanIterator
      */
     public function getScanIterator($tableName, array $args)
     {
         $args['TableName'] = $tableName;
 
         return $this->client->getScanIterator($args);
+    }
+
+    /**
+     * Generates a cache key for a getItem command.
+     * 
+     * @param array $args
+     * 
+     * @return string
+     */
+    protected function generateCacheKey(array $args)
+    {
+        self::recursiveArgumentsSort($args);
+
+        $cacheKey = $this->cacheKeyPrefix . '_' . sha1(serialize($args));
+
+        return $cacheKey;
+    }
+
+    /**
+     * Transforms the given array into a consistent one, to be hashed as a cache key.
+     * 
+     * @param array &$array Array to transform
+     * 
+     * @return void
+     */
+    protected static function recursiveArgumentsSort(array &$array)
+    {
+        $key = null;
+
+        foreach ($array as $key => &$value) {
+            if (is_array($value)) {
+                self::recursiveArgumentsSort($value);
+
+                // If key is numeric & value is an array, a hash of serialized value is generated
+                // to be able to sort values later.
+                if (is_numeric($key)) {
+                    $array[$key] = sha1(serialize($value));
+                }
+            }
+        }
+
+        // If last key is a string, use ksort
+        if (is_string($key)) {
+            ksort($array);
+        } else {
+            sort($array);
+        }
     }
 }

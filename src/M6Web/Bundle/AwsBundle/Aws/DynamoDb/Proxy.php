@@ -2,8 +2,6 @@
 
 namespace M6Web\Bundle\AwsBundle\Aws\DynamoDb;
 
-use M6Web\Bundle\AwsBundle\Event\Dispatchable;
-
 /**
  * DynamoDb Client Proxy
  */
@@ -53,9 +51,9 @@ class Proxy
     /**
      * Notify an event to the event dispatcher
      *
-     * @param string $command The command name
-     * @param array $arguments args of the command
-     * @param int $time exec time
+     * @param string $command   The command name
+     * @param array  $arguments Args of the command
+     * @param int    $time      Exec time
      *
      * @return void
      */
@@ -88,8 +86,8 @@ class Proxy
         }
 
         $class = new \ReflectionClass($eventClass);
-        if (!$class->implementsInterface('\M6Web\Bundle\AwsBundle\Event\Dispatchable')) {
-            throw new Exception("The Event class : ".$eventClass." must implement Dispatchable");
+        if (!$class->implementsInterface('\M6Web\Bundle\AwsBundle\Event\DispatcherInterface')) {
+            throw new Exception("The Event class : ".$eventClass." must implement DispatcherInterface");
         }
 
         $this->eventDispatcher = $eventDispatcher;
