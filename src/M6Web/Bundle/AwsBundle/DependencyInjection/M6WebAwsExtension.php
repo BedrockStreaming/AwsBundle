@@ -90,8 +90,8 @@ class M6WebAwsExtension extends Extension
     /**
      * loadDynamoDb
      *
-     * @param ContainerBuilder $container   Container
-     * @param array            $configs     Client config
+     * @param ContainerBuilder $container Container
+     * @param array            $configs   Client config
      */
     protected function loadDynamoDb(ContainerBuilder $container, array $configs)
     {
@@ -107,6 +107,18 @@ class M6WebAwsExtension extends Extension
 
             // M6 DynamoDb Client
             $clientDefinition = new Definition($clientClassName, $params);
+
+            if (array_key_exists('cache', $config)) {
+                $clientDefinition->addMethodCall(
+                    'setCache',
+                    [
+                        new Reference($config['cache']['service']),
+                        $config['cache']['ttl'],
+                        $config['cache']['key_prefix']
+                    ]
+                );
+            }
+
             $clientName = sprintf('m6web_aws.dynamodbclient.%s', $name);
             $container->setDefinition($clientName, $clientDefinition);
 

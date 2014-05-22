@@ -5,6 +5,7 @@ namespace M6Web\Bundle\AwsBundle\Aws\DynamoDb;
 use Aws\DynamoDb\DynamoDbClient;
 use Aws\DynamoDb\Model\Attribute;
 use Symfony\Component\EventDispatcher\EventDispatcher;
+use M6Web\Bundle\AwsBundle\Cache\CacheInterface;
 
 /**
  * DynamoDb Client
@@ -53,6 +54,11 @@ class Client
     protected $cacheKeyPrefix = 'm6_dynamodb_client';
 
     /**
+     * @var integer
+     */
+    protected $requestTtl = null;
+
+    /**
      * __construct
      *
      * @param DynamoDbClient $client Aws DynamoDb Client
@@ -76,17 +82,36 @@ class Client
      * Sets the cache service used by dynamoDb
      * 
      * @param CacheInterface $cacheService
+     * @param integer        $ttl
      * @param string         $cacheKeyPrefix
      *
      * @return Client
      */
-    public function setCache(CacheInterface $cacheService, $cacheKeyPrefix = null)
+    public function setCache(CacheInterface $cacheService, $ttl = null, $cacheKeyPrefix = null)
     {
         $this->cacheService   = $cacheService;
 
         if (is_string($cacheKeyPrefix)) {
             $this->cacheKeyPrefix = $cacheKeyPrefix;
         }
+
+        if (is_integer($ttl)) {
+            $this->requestTtl = $ttl;
+        }
+
+        return $this;
+    }
+
+    /**
+     * Sets the request cache time to live.
+     *
+     * @param integer $ttl New ttl
+     *
+     * @return Client
+     */
+    public function setRequestTtl($ttl)
+    {
+        $this->requestTtl = $ttl;
 
         return $this;
     }
@@ -177,7 +202,7 @@ class Client
             $cacheKey = $this->generateCacheKey($args);
 
             if ($this->cacheService->has($cacheKey)) {
-                return $this->cacheService->get($cacheKey);
+                return $this->cacheService->get(unserialize($cacheKey));
             }
         }
 
@@ -186,7 +211,7 @@ class Client
 
         // Saves to cache
         if ($this->cacheService !== null) {
-            $this->cacheService->set($cacheKey, $result);
+            $this->cacheService->set($cacheKey, serialize($result), $this->requestTtl);
         }
 
         return $result;
@@ -342,7 +367,7 @@ class Client
             $cacheKey = $this->generateCacheKey($args);
 
             if ($this->cacheService->has($cacheKey)) {
-                return $this->cacheService->get($cacheKey);
+                return unserialize($this->cacheService->get($cacheKey));
             }
         }
 
@@ -351,7 +376,7 @@ class Client
 
         // Saves to cache
         if ($this->cacheService !== null) {
-            $this->cacheService->set($cacheKey, $result);
+            $this->cacheService->set($cacheKey, serialize($result), $this->requestTtl);
         }
 
         return $result;
