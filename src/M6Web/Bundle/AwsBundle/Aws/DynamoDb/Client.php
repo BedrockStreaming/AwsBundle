@@ -202,7 +202,7 @@ class Client
             $cacheKey = $this->generateCacheKey($args);
 
             if ($this->cacheService->has($cacheKey)) {
-                return $this->cacheService->get(unserialize($cacheKey));
+                return unserialize($this->cacheService->get($cacheKey));
             }
         }
 
@@ -670,7 +670,7 @@ class Client
     {
         self::recursiveArgumentsSort($args);
 
-        $cacheKey = $this->cacheKeyPrefix . '_' . sha1(serialize($args));
+        $cacheKey = $this->cacheKeyPrefix . '_' . md5(serialize($args));
 
         return $cacheKey;
     }
@@ -693,15 +693,16 @@ class Client
                 // If key is numeric & value is an array, a hash of serialized value is generated
                 // to be able to sort values later.
                 if (is_numeric($key)) {
-                    $array[$key] = sha1(serialize($value));
+                    $array[$key] = md5(serialize($value));
                 }
             }
         }
 
-        // If last key is a string, use ksort
         if (is_string($key)) {
+            // If array has associative keys, the sort is on keys.
             ksort($array);
         } else {
+            // If array has numerics keys, the sort is on values.
             sort($array);
         }
     }

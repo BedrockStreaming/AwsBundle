@@ -140,6 +140,113 @@ class Client extends atoum
                         ->once();
     }
 
+    /**
+     * Tests if cache is used on getItem().
+     * 
+     * @return void
+     */
+    public function testCacheOnGetItem()
+    {
+        $this
+            ->if($cache = $this->createCacheMock())
+            ->and($awsClient = $this->createAwsClientMock())
+            ->and($awsClient->getMockController()->getItem = null)
+            ->and($client = new Base($awsClient))
+            ->and($client->setCache($cache))
+            ->and(
+                $client->getItem(
+                    $tableName = uniqid(),
+                    ['id' => ['N' => $id = uniqid()], 'parent' => ['S' => $parent = uniqid()]]
+                )
+            )
+            ->then
+                ->mock($cache)
+                    ->call('has')
+                        ->once()
+                    ->call('set')
+                        ->once()
+                    ->call('get')
+                        ->never()
+            ->if($cache->getMockController()->resetCalls())
+            ->and(
+                // New getItem() call to check if cache is used or not
+                $client->getItem(
+                    $tableName,
+                    ['parent' => ['S' => $parent], 'id' => ['N' => $id]] // Elements are inverted to test consistent keys
+                )
+            )
+            ->then
+                ->mock($cache)
+                    ->call('has')
+                        ->once()
+                    ->call('set')
+                        ->never()
+                    ->call('get')
+                        ->once()
+            ;
+    }
+
+    /**
+     * Tests if cache is used on batchGetItem().
+     * 
+     * @return void
+     */
+    public function testCacheOnBatchGetItem()
+    {
+        $this
+            ->if($cache = $this->createCacheMock())
+            ->and($awsClient = $this->createAwsClientMock())
+            ->and($awsClient->getMockController()->batchGetItem = null)
+            ->and($client = new Base($awsClient))
+            ->and($client->setCache($cache))
+            ->and(
+                $client->batchGetItem(
+                    [
+                        ($tableName = uniqid()) => [
+                            'Keys' => [
+                                'id'     => ['N' => $id = uniqid()], 
+                                'parent' => ['S' => $parent = uniqid()]
+                            ],
+                            'AttributesToGet' => ['id', 'parent'],
+                        ]
+                    ]
+                )
+            )
+            ->then
+                ->mock($cache)
+                    ->call('has')
+                        ->once()
+                    ->call('set')
+                        ->once()
+                    ->call('get')
+                        ->never()
+            ->if($cache->getMockController()->resetCalls())
+            ->and(
+                // New getItem() call to check if cache is used or not
+                $client->batchGetItem(
+                    [
+                        // Elements are sorted in a different way, to test consistent cache key
+                        $tableName => [
+                            'AttributesToGet' => ['parent', 'id'],
+                            'Keys' => [
+                                'parent' => ['S' => $parent],
+                                'id'     => ['N' => $id]
+                            ],
+                        ]
+                    ]
+                )
+            )
+            ->then
+                ->mock($cache)
+                    ->call('has')
+                        ->once()
+                    ->call('set')
+                        ->never()
+                    ->call('get')
+                        ->once()
+            ;
+    }
+
     protected function createAwsClientMock()
     {
         $credentials = new \mock\Aws\Common\Credentials\CredentialsInterface();
@@ -147,5 +254,21 @@ class Client extends atoum
         $collection  = new \mock\Guzzle\Common\Collection();
 
         return new \mock\Aws\DynamoDb\DynamoDbClient($credentials, $signature, $collection);
+    }
+
+    protected function createCacheMock()
+    {
+        $mock = new \mock\M6Web\Bundle\AwsBundle\Cache\CacheInterface();
+        $mock->values = [];
+
+        $mock->getMockController()->set = function($key, $value, $ttl = null) {
+            $this->values[$key] = $value;
+        };
+
+        $mock->getMockController()->has = function($key) {
+            return array_key_exists($key, $this->values);
+        };
+
+        return $mock;
     }
 }
