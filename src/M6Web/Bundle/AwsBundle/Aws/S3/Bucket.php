@@ -66,7 +66,10 @@ class Bucket
     }
 
     /**
-     * exists
+     * exist
+     *
+     * @param string $accept403
+     * @param array  $options
      *
      * @return boolean
      */
@@ -79,6 +82,8 @@ class Bucket
      * waitUntilExist
      *
      * @param array $policy
+     *
+     * @return boolean
      */
     public function waitUntilExist(array $policy = array())
     {
@@ -94,6 +99,8 @@ class Bucket
      * waitUntilNotExist
      *
      * @param array $params
+     *
+     * @return boolean
      */
     public function waitUntilNotExist(array $params = array())
     {
@@ -104,6 +111,8 @@ class Bucket
 
     /**
      * create
+     *
+     * @param array $params
      *
      * @return boolean
      */
@@ -140,6 +149,8 @@ class Bucket
 
     /**
      * delete
+     *
+     * @param boolean $wait
      *
      * @return Guzzle\Service\Resource\Model
      */
@@ -528,7 +539,6 @@ class Bucket
      * getObjectTorrent
      *
      * @param string $key
-     * @param array  $params
      *
      * @return Guzzle\Service\Resource\Model
      */
@@ -595,7 +605,7 @@ class Bucket
     /**
      * restoreObject
      *
-     * @param string $key
+     * @param string  $key
      * @param integer $days
      *
      * @return Guzzle\Service\Resource\Model
@@ -631,7 +641,7 @@ class Bucket
      * @param mixed  $expires
      * @param array  $params
      *
-     * return string
+     * @return string
      */
     public function getObjectUrl($key, $expires = null, array $params = array())
     {
@@ -728,7 +738,7 @@ class Bucket
      *
      * @param string  $key
      * @param string  $uploadId
-     * @param mixed   $body          string|resource|\Guzzle\Http\EntityBodyInterface
+     * @param mixed   $body
      * @param integer $partNumber
      * @param string  $contentLength
      *
@@ -826,7 +836,7 @@ class Bucket
      * abortMultipartUpload
      *
      * @param string $key
-     * @param string uploadId
+     * @param string $uploadId
      *
      * @return Guzzle\Service\Resource\Model
      */
