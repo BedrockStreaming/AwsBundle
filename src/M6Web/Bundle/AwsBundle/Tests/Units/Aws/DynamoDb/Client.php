@@ -6,6 +6,7 @@ require_once __DIR__ . '/../../../../../../../../vendor/autoload.php';
 
 use atoum;
 use M6Web\Bundle\AwsBundle\Aws\DynamoDb\Client as Base;
+use Aws\DynamoDb\Model\Attribute;
 
 /**
  * DynamoDb Client
@@ -23,7 +24,7 @@ class Client extends atoum
             ->and($client = new Base($awsClient))
             ->and(
                 $client->getItem(
-                    $tableName = uniqid(), 
+                    $tableName = uniqid(),
                     $key = ['id' => ['N' => 1234]]
                 )
             )
@@ -50,11 +51,11 @@ class Client extends atoum
             ->and($client = new Base($awsClient))
             ->and(
                 $client->putItem(
-                    $tableName = uniqid(), 
-                    $item = [
+                    $tableName = uniqid(),
+                    $item = $client->formatAttributes([
                         'id'    => 1234,
                         'title' => 'Clip de test'
-                    ]
+                    ], Attribute::FORMAT_PUT)
                 )
             )
             ->then
@@ -85,12 +86,12 @@ class Client extends atoum
             ->and($client = new Base($awsClient))
             ->and(
                 $client->updateItem(
-                    $tableName = uniqid(), 
+                    $tableName = uniqid(),
                     $key = ['id' => ['N' => uniqid()]],
-                    $attributes = [
+                    $attributes = $client->formatAttributes([
                         'id'    => 1234,
                         'title' => 'Clip de test'
-                    ]
+                    ], Attribute::FORMAT_UPDATE)
                 )
             )
             ->then
@@ -122,7 +123,7 @@ class Client extends atoum
             ->and($client = new Base($awsClient))
             ->and(
                 $client->deleteItem(
-                    $tableName = uniqid(), 
+                    $tableName = uniqid(),
                     $key = ['id' => ['N' => 1234]]
                 )
             )
@@ -142,7 +143,7 @@ class Client extends atoum
 
     /**
      * Tests if cache is used on getItem().
-     * 
+     *
      * @return void
      */
     public function testCacheOnGetItem()
@@ -188,7 +189,7 @@ class Client extends atoum
 
     /**
      * Tests if cache is used on batchGetItem().
-     * 
+     *
      * @return void
      */
     public function testCacheOnBatchGetItem()
@@ -204,7 +205,7 @@ class Client extends atoum
                     [
                         ($tableName = uniqid()) => [
                             'Keys' => [
-                                'id'     => ['N' => $id = uniqid()], 
+                                'id'     => ['N' => $id = uniqid()],
                                 'parent' => ['S' => $parent = uniqid()]
                             ],
                             'AttributesToGet' => ['id', 'parent'],
