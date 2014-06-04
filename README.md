@@ -112,6 +112,17 @@
     echo"\n===> READ : $i\n";
 ```
 
+### dataCollector
+
+Datacollector is enabled by defaut.
+
+To de-activate
+
+```
+m6_web_aws:
+    disable_data_collector: true
+```
+
 # Unit Test
 
 ```

@@ -77,6 +77,7 @@ class Configuration implements ConfigurationInterface
                         ->end()
                     ->end()
                 ->end()
+                ->booleanNode('disable_data_collector')->defaultValue(false)->end()
                 ->arrayNode('dynamodb')
                     ->requiresAtLeastOneElement()
                     ->prototype('array')
