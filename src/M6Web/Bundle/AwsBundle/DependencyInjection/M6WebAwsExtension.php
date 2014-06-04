@@ -27,7 +27,10 @@ class M6WebAwsExtension extends Extension
 
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('services.yml');
-        $loader->load('data_collector.yml');
+
+        if (!$config['disable_data_collector']) {
+            $loader->load('data_collector.yml');
+        }
 
         if (!empty($config['aws_factory_class'])) {
             $container->setParameter('m6web_aws.aws_factory.class', $config['aws_factory_class']);
@@ -101,7 +104,7 @@ class M6WebAwsExtension extends Extension
         foreach ($configs as $name => $config) {
             // AWS DynamoDb Client
             $awsClientName = sprintf('m6web_aws.%s', $config['client']);
-            $params = [
+            $params        = [
                 'client' => new Reference($awsClientName)
             ];
 

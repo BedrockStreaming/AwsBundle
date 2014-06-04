@@ -5,3 +5,11 @@ services:
         tags:
             - { name: data_collector, template: 'M6WebAwsBundle:Collector:sqs', id: 'sqs' }
             - { name: kernel.event_listener, event: sqs.command, method: onCommand }
+
+    m6.data_collector.dynamodb:
+        class: M6Web\Bundle\AwsBundle\Aws\DataCollector
+        arguments: ['dynamodb']
+        tags:
+            - { name: data_collector, template: 'M6WebAwsBundle:Collector:dynamodb', id: 'dynamodb' }
+            - { name: kernel.event_listener, event: dynamodb.command, method: onCommand }
+            
