@@ -111,7 +111,7 @@ class Proxy
                 $this->notifyEvent($name, $arguments, microtime(true) - $start);
 
                 return $ret;
-            } catch (SqsException $e) {
+            } catch (Exception $e) {
                 throw new Exception("Error calling the method " . $name . " : " . $e->getMessage());
             }
         } else {
