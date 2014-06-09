@@ -215,16 +215,16 @@ class Client
      * http://docs.aws.amazon.com/aws-sdk-php/latest/class-Aws.Sqs.SqsClient.html#_deleteMessage
      *
      * @param string $queueId       The URL of the Amazon SQS queue to take action on.
-     * @param string $receiveHandle The receipt handle associated with the message to delete.
+     * @param string $receiptHandle The receipt handle associated with the message to delete.
      *
      * @return boolean
      * @throws SqsException
      */
-    public function deleteMessage($queueId, $receiveHandle)
+    public function deleteMessage($queueId, $receiptHandle)
     {
         $result = $this->client->deleteMessage([
             'QueueUrl' => $this->getQueue($queueId),
-            'ReceiptHandle' => $receiveHandle
+            'ReceiptHandle' => $receiptHandle
         ]);
 
         if ($result instanceof Model) {
@@ -232,5 +232,36 @@ class Client
         }
 
         return false;
+    }
+
+    /**
+     * Deletes multiple messages.
+     * This is a batch version of DeleteMessage.
+     * The result of the delete action on each message is reported individually in the response.
+     *
+     * If you leave a message in the queue for longer than the queue's configured retention period,
+     * Amazon SQS automatically deletes it.
+     *
+     * For more information, please see :
+     * http://docs.aws.amazon.com/aws-sdk-php/latest/class-Aws.Sqs.SqsClient.html#_deleteMessageBatch
+     *
+     * @param string $queueId The URL of the Amazon SQS queue to take action on.
+     * @param array  $entries A list of receipt handles for the messages to be deleted.
+     *
+     * @return Guzzle\Service\Resource\Model
+     * @throws SqsException
+     */
+    public function deleteMessageBatch($queueId, array $entries)
+    {
+        $result = $this->client->deleteMessageBatch([
+            'QueueUrl' => $this->getQueue($queueId),
+            'Entries' => $entries
+        ]);
+
+        if ($result instanceof Model) {
+            return $result;
+        }
+
+        return null;
     }
 }
