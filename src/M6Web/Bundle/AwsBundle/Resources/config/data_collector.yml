@@ -6,10 +6,16 @@ services:
             - { name: data_collector, template: 'M6WebAwsBundle:Collector:sqs', id: 'sqs' }
             - { name: kernel.event_listener, event: sqs.command, method: onCommand }
 
+    m6.data_collector.sts:
+        class: M6Web\Bundle\AwsBundle\Aws\DataCollector
+        arguments: ['sts']
+        tags:
+            - { name: data_collector, template: 'M6WebAwsBundle:Collector:sts', id: 'sts' }
+            - { name: kernel.event_listener, event: sts.command, method: onCommand }
+
     m6.data_collector.dynamodb:
         class: M6Web\Bundle\AwsBundle\Aws\DataCollector
         arguments: ['dynamodb']
         tags:
             - { name: data_collector, template: 'M6WebAwsBundle:Collector:dynamodb', id: 'dynamodb' }
             - { name: kernel.event_listener, event: dynamodb.command, method: onCommand }
-            
