@@ -51,6 +51,10 @@ class M6WebAwsExtension extends Extension
             $this->loadSqs($container, $config['sqs']);
         }
 
+        if (array_key_exists('sts', $config)) {
+            $this->loadSts($container, $config['sts']);
+        }
+
         if (array_key_exists('dynamodb', $config)) {
             $this->loadDynamoDb($container, $config['dynamodb']);
         }
@@ -176,6 +180,44 @@ class M6WebAwsExtension extends Extension
                 [new Reference('event_dispatcher'), 'M6Web\Bundle\AwsBundle\Event\Command']
             );
             $container->setDefinition(sprintf('m6web_aws.sqs.%s', $name), $proxyDefinition);
+        }
+    }
+
+    /**
+     * loadSts
+     *
+     * @param ContainerBuilder $container Container
+     * @param array            $configs   Client config
+     */
+    protected function loadSts(ContainerBuilder $container, array $configs)
+    {
+        $clientClassName = $container->getParameter('m6web_aws.sts.client.class');
+        $proxyClassName  = $container->getParameter('m6web_aws.sts.proxy.class');
+
+        foreach ($configs as $name => $config) {
+            // Aws Sts Client
+            $awsClientName = sprintf('m6web_aws.%s', $config['client']);
+            $params        = array(
+                'client' => new Reference($awsClientName)
+            );
+
+            // M6 Sts Client
+            $clientDefinition = new Definition($clientClassName, $params);
+            $clientName       = sprintf('m6web_aws.stsclient.%s', $name);
+            $container->setDefinition($clientName, $clientDefinition);
+
+            // M6 Proxy Sqs Client
+            $params = array(
+                'client' => new Reference($clientName)
+            );
+
+            $proxyDefinition = new Definition($proxyClassName, $params);
+            $proxyDefinition->setScope(ContainerInterface::SCOPE_CONTAINER);
+            $proxyDefinition->addMethodCall(
+                'setEventDispatcher',
+                [new Reference('event_dispatcher'), 'M6Web\Bundle\AwsBundle\Event\Command']
+            );
+            $container->setDefinition(sprintf('m6web_aws.sts.%s', $name), $proxyDefinition);
         }
     }
 

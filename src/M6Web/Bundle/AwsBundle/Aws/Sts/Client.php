@@ -61,6 +61,7 @@ class Client
      * @return Credentials
      *
      * @throws Aws\Common\Exception\InvalidArgumentException If the result does not contain credential data
+     * @see http://docs.aws.amazon.com/aws-sdk-php/latest/class-Aws.Sts.StsClient.html#_createCredentials
      */
     public function createCredentials(Model $result)
     {
@@ -89,11 +90,11 @@ class Client
     public function assumeRole(
         $roleArn,
         $roleSessionName,
-        $policy = null,
+        $policy          = null,
         $durationSeconds = 3600,
-        $externalId = null,
-        $serialNumber = null,
-        $tokenCode = null
+        $externalId      = null,
+        $serialNumber    = null,
+        $tokenCode       = null
     )
     {
         $args = [
