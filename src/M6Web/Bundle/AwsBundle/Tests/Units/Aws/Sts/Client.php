@@ -33,9 +33,9 @@ class Client extends atoum
     }
 
     /**
-     * Tests assumeRole method with required parameters only.
+     * Tests assumeRole method
      */
-    public function testAssumeRoleRequiredParams()
+    public function testAssumeRole()
     {
         $this
             ->if($stsClient = $this->createStsClientMock())
@@ -57,13 +57,7 @@ class Client extends atoum
                             'DurationSeconds' => 3600
                         ])
                         ->once();
-    }
 
-    /**
-     * Tests assumeRole method with all parameters.
-     */
-    public function testAssumeRoleAllParams()
-    {
         $this
             ->if($stsClient = $this->createStsClientMock())
             ->and($client = new Base($stsClient))
@@ -96,11 +90,11 @@ class Client extends atoum
     }
 
     /**
-     * Tests assumeRoleWithSAML method with required parameters only.
+     * Tests assumeRoleWithSAML method
      * 
      * @return void
      */
-    public function testAssumeRoleWithSAMLRequiredParams()
+    public function testAssumeRoleWithSAML()
     {
         $this
             ->if($stsClient = $this->createStsClientMock())
@@ -124,15 +118,7 @@ class Client extends atoum
                             'DurationSeconds' => 3600
                         ])
                         ->once();
-    }
 
-    /**
-     * Tests assumeRoleWithSAML method with all parameters.
-     * 
-     * @return void
-     */
-    public function testAssumeRoleWithSAMLAllParams()
-    {
         $this
             ->if($stsClient = $this->createStsClientMock())
             ->and($client = new Base($stsClient))
@@ -161,11 +147,11 @@ class Client extends atoum
     }
 
     /**
-     * Tests assumeRoleWithWebIdentity method with required parameters only.
+     * Tests assumeRoleWithWebIdentity method.
      * 
      * @return void
      */
-    public function testAssumeRoleWithWebIdentityRequiredParams()
+    public function testAssumeRoleWithWebIdentity()
     {
         $this
             ->if($stsClient = $this->createStsClientMock())
@@ -189,15 +175,7 @@ class Client extends atoum
                             'DurationSeconds'  => 3600
                         ])
                         ->once();
-    }
 
-    /**
-     * Tests assumeRoleWithWebIdentity method with all parameters.
-     * 
-     * @return void
-     */
-    public function testAssumeRoleWithWebIdentityAllParams()
-    {
         $this
             ->if($stsClient = $this->createStsClientMock())
             ->and($client = new Base($stsClient))
@@ -250,11 +228,11 @@ class Client extends atoum
     }
 
     /**
-     * Tests getFederationToken method with required parameters only.
+     * Tests getFederationToken method
      * 
      * @return void
      */
-    public function testGetFederationTokenRequiredParams()
+    public function testGetFederationToken()
     {
         $this
             ->if($stsClient = $this->createStsClientMock())
@@ -274,15 +252,7 @@ class Client extends atoum
                             'DurationSeconds' => 43200
                         ])
                         ->once();
-    }
 
-    /**
-     * Tests getFederationToken method with all parameters.
-     * 
-     * @return void
-     */
-    public function testGetFederationTokenAllParams()
-    {
         $this
             ->if($stsClient = $this->createStsClientMock())
             ->and($client = new Base($stsClient))
@@ -307,11 +277,11 @@ class Client extends atoum
     }
 
     /**
-     * Tests getSessionToken method with no parameters.
+     * Tests getSessionToken method.
      * 
      * @return void
      */
-    public function testGetSessionTokenNoParams()
+    public function testGetSessionToken()
     {
         $this
             ->if($stsClient = $this->createStsClientMock())
@@ -326,15 +296,7 @@ class Client extends atoum
                             'DurationSeconds' => 43200
                         ])
                         ->once();
-    }
 
-    /**
-     * Tests getSessionToken method with all parameters.
-     * 
-     * @return void
-     */
-    public function testGetSessionTokenAllParams()
-    {
         $this
             ->if($stsClient = $this->createStsClientMock())
             ->and($client = new Base($stsClient))
