@@ -4,7 +4,6 @@ namespace M6Web\Bundle\AwsBundle\Aws\Sts;
 
 use Aws\Sts\StsClient;
 
-use Symfony\Component\EventDispatcher\EventDispatcher;
 use Aws\Common\Credentials\Credentials;
 use Guzzle\Service\Resource\Model;
 
@@ -19,11 +18,6 @@ class Client
     protected $client;
 
     /**
-     * @var EventDispatcher
-     */
-    protected $eventDispatcher;
-
-    /**
      * __construct
      *
      * @param StsClient $client Aws Sts Client
@@ -31,16 +25,6 @@ class Client
     public function __construct(StsClient $client)
     {
         $this->client = $client;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setEventDispatcher(EventDispatcher $eventDispatcher)
-    {
-        $this->eventDispatcher = $eventDispatcher;
-
-        return $this;
     }
 
     /**
