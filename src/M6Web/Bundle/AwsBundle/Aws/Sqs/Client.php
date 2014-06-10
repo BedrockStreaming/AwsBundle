@@ -146,6 +146,42 @@ class Client
     }
 
     /**
+     * Delivers up to ten messages to the specified queue. This is a batch version of SendMessage.
+     * The result of the send action on each message is reported individually in the response.
+     * The maximum allowed individual message size is 256 KB (262,144 bytes).
+     *
+     * The maximum total payload size (i.e., the sum of all a batch's individual message lengths)
+     * is also 256 KB (262,144 bytes).
+     *
+     * If the DelaySeconds parameter is not specified for an entry,
+     * the default for the queue is used.
+     *
+     * For more information, please see :
+     * http://docs.aws.amazon.com/aws-sdk-php/latest/class-Aws.Sqs.SqsClient.html#_sendMessageBatch
+     *
+     * @param string $queueId The name of the Amazon SQS queue to take action on.
+     * @param array  $entries A list of SendMessageBatchRequestEntry items.
+     *
+     * @return Guzzle\Service\Resource\Model
+     * @throws SqsException
+     */
+    public function sendMessageBatch($queueId, array $entries)
+    {
+        $args = [
+            'QueueUrl' => $this->getQueue($queueId),
+            'Entries' => $entries
+        ];
+
+        $result = $this->client->sendMessageBatch($args);
+
+        if ($result instanceof Model) {
+            return $result;
+        }
+
+        return null;
+    }
+
+    /**
      * Retrieves one or more messages from the specified queue.
      * Long poll support is enabled by using the WaitTimeSeconds parameter.
      * For more information, see Amazon SQS Long Poll in the Amazon SQS Developer Guide.
