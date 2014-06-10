@@ -2,6 +2,8 @@
 
 namespace M6Web\Bundle\AwsBundle\Aws\DynamoDb;
 
+use Aws\DynamoDb\Exception\DynamoDbException;
+
 /**
  * DynamoDb Client Proxy
  */
@@ -111,7 +113,7 @@ class Proxy
                 $this->notifyEvent($name, $arguments, microtime(true) - $start);
 
                 return $ret;
-            } catch (SqsException $e) {
+            } catch (DynamoDbException $e) {
                 throw new Exception("Error calling the method " . $name . " : " . $e->getMessage());
             }
         } else {
