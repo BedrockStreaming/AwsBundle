@@ -26,7 +26,7 @@ class Client
     /**
      * __construct
      *
-     * @param DynamoDbClient $client Aws Sts Client
+     * @param StsClient $client Aws Sts Client
      */
     public function __construct(StsClient $client)
     {
