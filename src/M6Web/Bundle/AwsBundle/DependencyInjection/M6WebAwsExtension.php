@@ -48,15 +48,31 @@ class M6WebAwsExtension extends Extension
         }
 
         if (array_key_exists('sqs', $config)) {
-            $this->loadSqs($container, $config['sqs']);
+            $this->loadProxyClient($container, $config['sqs'], 'sqs');
         }
 
         if (array_key_exists('sts', $config)) {
-            $this->loadSts($container, $config['sts']);
+            $this->loadProxyClient($container, $config['sts'], 'sts');
         }
 
         if (array_key_exists('dynamodb', $config)) {
-            $this->loadDynamoDb($container, $config['dynamodb']);
+            $this->loadProxyClient(
+                $container,
+                $config['dynamodb'],
+                'dynamodb',
+                function ($clientDefinition, $config) {
+                    if (array_key_exists('cache', $config)) {
+                        $clientDefinition->addMethodCall(
+                            'setCache',
+                            [
+                                new Reference($config['cache']['service']),
+                                $config['cache']['ttl'],
+                                $config['cache']['key_prefix']
+                            ]
+                        );
+                    }
+                }
+            );
         }
     }
 
@@ -72,10 +88,10 @@ class M6WebAwsExtension extends Extension
     {
         $className      = $container->getParameter('m6web_aws.client.class');
         $factoryService = $container->getParameter('m6web_aws.client_factory.name');
-        $params         = array(
+        $params         = [
             'service' => $config['service'],
             'config'  => $credentials[$config['credential']]
-        );
+        ];
 
         if (!empty($config['region'])) {
             $params['region'] = $config['region'];
@@ -95,41 +111,39 @@ class M6WebAwsExtension extends Extension
     }
 
     /**
-     * loadDynamoDb
-     *
-     * @param ContainerBuilder $container Container
+     * Loads a client with its proxy
+     * 
+     * @param ContainerBuilder $container Container builder
      * @param array            $configs   Client config
+     * @param string           $configKey Key of this element in the configuration (eg: 'sts', 'sqs', 'dynamodb')
+     * @param Closure          $onCreate  Closure to add specific operations on client creation
+     * 
+     * @return void
      */
-    protected function loadDynamoDb(ContainerBuilder $container, array $configs)
+    protected function loadProxyClient(ContainerBuilder $container, array $configs, $configKey, \Closure $onCreate = null)
     {
-        $clientClassName = $container->getParameter('m6web_aws.dynamodb.client.class');
-        $proxyClassName  = $container->getParameter('m6web_aws.dynamodb.proxy.class');
+        $clientClassName = $container->getParameter('m6web_aws.' . $configKey . '.client.class');
+        $proxyClassName  = $container->getParameter('m6web_aws.' . $configKey . '.proxy.class');
 
         foreach ($configs as $name => $config) {
-            // AWS DynamoDb Client
+            // Aws Client
             $awsClientName = sprintf('m6web_aws.%s', $config['client']);
             $params        = [
                 'client' => new Reference($awsClientName)
             ];
 
-            // M6 DynamoDb Client
+            // M6 Client
             $clientDefinition = new Definition($clientClassName, $params);
 
-            if (array_key_exists('cache', $config)) {
-                $clientDefinition->addMethodCall(
-                    'setCache',
-                    [
-                        new Reference($config['cache']['service']),
-                        $config['cache']['ttl'],
-                        $config['cache']['key_prefix']
-                    ]
-                );
+            // If there is a defined closure to call on client creation
+            if (is_callable($onCreate)) {
+                $onCreate($clientDefinition, $config);
             }
 
-            $clientName = sprintf('m6web_aws.dynamodbclient.%s', $name);
+            $clientName       = sprintf('m6web_aws.' . $configKey . 'client.%s', $name);
             $container->setDefinition($clientName, $clientDefinition);
 
-            // M6 DynamoDb Client Proxy
+            // M6 Proxy
             $params = [
                 'client' => new Reference($clientName)
             ];
@@ -140,84 +154,7 @@ class M6WebAwsExtension extends Extension
                 'setEventDispatcher',
                 [new Reference('event_dispatcher'), 'M6Web\Bundle\AwsBundle\Event\Command']
             );
-
-            $container->setDefinition(sprintf('m6web_aws.dynamodb.%s', $name), $proxyDefinition);
-        }
-    }
-
-    /**
-     * loadSqs
-     *
-     * @param ContainerBuilder $container Container
-     * @param array            $configs   Client config
-     */
-    protected function loadSqs(ContainerBuilder $container, array $configs)
-    {
-        $clientClassName = $container->getParameter('m6web_aws.sqs.client.class');
-        $proxyClassName  = $container->getParameter('m6web_aws.sqs.proxy.class');
-
-        foreach ($configs as $name => $config) {
-            // Aws Sqs Client
-            $awsClientName = sprintf('m6web_aws.%s', $config['client']);
-            $params        = array(
-                'client' => new Reference($awsClientName)
-            );
-
-            // M6 Sqs Client
-            $clientDefinition = new Definition($clientClassName, $params);
-            $clientName       = sprintf('m6web_aws.sqsclient.%s', $name);
-            $container->setDefinition($clientName, $clientDefinition);
-
-            // M6 Proxy Sqs Client
-            $params = array(
-                'client' => new Reference($clientName)
-            );
-
-            $proxyDefinition = new Definition($proxyClassName, $params);
-            $proxyDefinition->setScope(ContainerInterface::SCOPE_CONTAINER);
-            $proxyDefinition->addMethodCall(
-                'setEventDispatcher',
-                [new Reference('event_dispatcher'), 'M6Web\Bundle\AwsBundle\Event\Command']
-            );
-            $container->setDefinition(sprintf('m6web_aws.sqs.%s', $name), $proxyDefinition);
-        }
-    }
-
-    /**
-     * loadSts
-     *
-     * @param ContainerBuilder $container Container
-     * @param array            $configs   Client config
-     */
-    protected function loadSts(ContainerBuilder $container, array $configs)
-    {
-        $clientClassName = $container->getParameter('m6web_aws.sts.client.class');
-        $proxyClassName  = $container->getParameter('m6web_aws.sts.proxy.class');
-
-        foreach ($configs as $name => $config) {
-            // Aws Sts Client
-            $awsClientName = sprintf('m6web_aws.%s', $config['client']);
-            $params        = array(
-                'client' => new Reference($awsClientName)
-            );
-
-            // M6 Sts Client
-            $clientDefinition = new Definition($clientClassName, $params);
-            $clientName       = sprintf('m6web_aws.stsclient.%s', $name);
-            $container->setDefinition($clientName, $clientDefinition);
-
-            // M6 Proxy Sqs Client
-            $params = array(
-                'client' => new Reference($clientName)
-            );
-
-            $proxyDefinition = new Definition($proxyClassName, $params);
-            $proxyDefinition->setScope(ContainerInterface::SCOPE_CONTAINER);
-            $proxyDefinition->addMethodCall(
-                'setEventDispatcher',
-                [new Reference('event_dispatcher'), 'M6Web\Bundle\AwsBundle\Event\Command']
-            );
-            $container->setDefinition(sprintf('m6web_aws.sts.%s', $name), $proxyDefinition);
+            $container->setDefinition(sprintf('m6web_aws.' . $configKey . '.%s', $name), $proxyDefinition);
         }
     }
 
@@ -247,10 +184,10 @@ class M6WebAwsExtension extends Extension
     {
         $className  = $container->getParameter('m6web_aws.bucket.class');
         $clientName = sprintf('m6web_aws.%s', $config['client']);
-        $params     = array(
+        $params     = [
             'client' => new Reference($clientName),
             'name'   => $config['name']
-        );
+        ];
 
         $definition = new Definition($className, $params);
 
