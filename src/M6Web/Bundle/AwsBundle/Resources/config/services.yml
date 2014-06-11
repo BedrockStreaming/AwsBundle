@@ -4,6 +4,9 @@ parameters:
     m6web_aws.sqs.client.class: M6Web\Bundle\AwsBundle\Aws\Sqs\Client
     m6web_aws.sqs.proxy.class: M6Web\Bundle\AwsBundle\Aws\Sqs\Proxy
 
+    m6web_aws.sts.client.class: M6Web\Bundle\AwsBundle\Aws\Sts\Client
+    m6web_aws.sts.proxy.class: M6Web\Bundle\AwsBundle\Aws\Sts\Proxy
+
     m6web_aws.dynamodb.client.class: M6Web\Bundle\AwsBundle\Aws\DynamoDb\Client
     m6web_aws.dynamodb.proxy.class: M6Web\Bundle\AwsBundle\Aws\DynamoDb\Proxy
 

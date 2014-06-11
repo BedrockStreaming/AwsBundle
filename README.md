@@ -43,6 +43,10 @@
         - `dev`: Name of the sqs config (use to define service name)
             - `client`: "sqs_client" Client name defined above
 
+    - `sts`:
+        - `dev`: Name of the sts config (use to define service name)
+            - `client`: "sts_client" Client name defined above
+
     - `dynamodb`:
         - `dev`: Name of the client
             - `client`: "6cloud_cdn" Client name defined above
@@ -110,6 +114,18 @@
     }
 
     echo"\n===> READ : $i\n";
+```
+
+# STS Example
+
+```
+    $client = $this->getContainer()->get('m6web_aws.sts.m6');
+
+    $sessionToken = $client->getSessionToken();
+    $credentials  = $client->createCredentials($sessionToken);
+
+    echo "Key : " . $credentials->getSecretKey() . "\n";
+    echo "Token : " . $credentials->getSecurityToken() . "\n";
 ```
 
 ### dataCollector

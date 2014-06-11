@@ -2,8 +2,6 @@
 
 namespace M6Web\Bundle\AwsBundle\Tests\Units\Aws\DynamoDb;
 
-require_once __DIR__ . '/../../../../../../../../vendor/autoload.php';
-
 use atoum;
 use M6Web\Bundle\AwsBundle\Aws\DynamoDb\Client as Base;
 use Aws\DynamoDb\Model\Attribute;

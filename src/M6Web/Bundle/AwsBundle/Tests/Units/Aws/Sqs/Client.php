@@ -2,8 +2,6 @@
 
 namespace M6Web\Bundle\AwsBundle\Tests\Units\Aws\Sqs;
 
-require_once __DIR__ . '/../../../../../../../../vendor/autoload.php';
-
 use atoum;
 use M6Web\Bundle\AwsBundle\Aws\Sqs\Client as Base;
 use Aws\Sqs\Exception\SqsException;

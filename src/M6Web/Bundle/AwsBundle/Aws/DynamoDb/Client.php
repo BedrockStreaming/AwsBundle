@@ -4,7 +4,6 @@ namespace M6Web\Bundle\AwsBundle\Aws\DynamoDb;
 
 use Aws\DynamoDb\DynamoDbClient;
 use Aws\DynamoDb\Model\Attribute;
-use Symfony\Component\EventDispatcher\EventDispatcher;
 use M6Web\Bundle\AwsBundle\Cache\CacheInterface;
 
 /**
@@ -39,11 +38,6 @@ class Client
     protected $client;
 
     /**
-     * @var EventDispatcher
-     */
-    protected $eventDispatcher;
-
-    /**
      * @var CacheInterface
      */
     protected $cacheService = null;
@@ -66,16 +60,6 @@ class Client
     public function __construct(DynamoDbClient $client)
     {
         $this->client = $client;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setEventDispatcher(EventDispatcher $eventDispatcher)
-    {
-        $this->eventDispatcher = $eventDispatcher;
-
-        return $this;
     }
 
     /**
