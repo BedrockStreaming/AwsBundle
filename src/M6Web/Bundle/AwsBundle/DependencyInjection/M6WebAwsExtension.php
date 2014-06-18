@@ -90,7 +90,7 @@ class M6WebAwsExtension extends Extension
         $factoryService = $container->getParameter('m6web_aws.client_factory.name');
         $params         = [
             'service' => $config['service'],
-            'config'  => $credentials[$config['credential']]
+            'config'  => !empty($config['credential']) ? $credentials[$config['credential']] : array()
         ];
 
         if (!empty($config['region'])) {
@@ -112,12 +112,12 @@ class M6WebAwsExtension extends Extension
 
     /**
      * Loads a client with its proxy
-     * 
+     *
      * @param ContainerBuilder $container Container builder
      * @param array            $configs   Client config
      * @param string           $configKey Key of this element in the configuration (eg: 'sts', 'sqs', 'dynamodb')
      * @param Closure          $onCreate  Closure to add specific operations on client creation
-     * 
+     *
      * @return void
      */
     protected function loadProxyClient(ContainerBuilder $container, array $configs, $configKey, \Closure $onCreate = null)
