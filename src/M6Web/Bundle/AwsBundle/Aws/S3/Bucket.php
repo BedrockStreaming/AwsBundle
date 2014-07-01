@@ -3,7 +3,7 @@
 namespace M6Web\Bundle\AwsBundle\Aws\S3;
 
 use Aws\S3\S3Client;
-use Guzzle\Service\Resource\Model;
+
 
 /**
  * Bucket
@@ -141,7 +141,7 @@ class Bucket
     /**
      * head
      *
-     * @return Model
+     * @return \Guzzle\Service\Resource\Model
      */
     public function head()
     {
@@ -153,7 +153,7 @@ class Bucket
      *
      * @param boolean $wait
      *
-     * @return Model
+     * @return \Guzzle\Service\Resource\Model
      */
     public function delete($wait = false)
     {
@@ -169,7 +169,7 @@ class Bucket
     /**
      * getAcl
      *
-     * @return Model
+     * @return \Guzzle\Service\Resource\Model
      */
     public function getAcl()
     {
@@ -181,7 +181,7 @@ class Bucket
      *
      * @param array $params
      *
-     * @return Model
+     * @return \Guzzle\Service\Resource\Model
      */
     public function putAcl(array $params = array())
     {
@@ -193,7 +193,7 @@ class Bucket
     /**
      * getCors
      *
-     * @return Model
+     * @return \Guzzle\Service\Resource\Model
      */
     public function getCors()
     {
@@ -205,7 +205,7 @@ class Bucket
      *
      * @param array $corsRules
      *
-     * @return Model
+     * @return \Guzzle\Service\Resource\Model
      */
     public function putCors(array $corsRules = array())
     {
@@ -220,7 +220,7 @@ class Bucket
     /**
      * deleteCors
      *
-     * @return Model
+     * @return \Guzzle\Service\Resource\Model
      */
     public function deleteCors()
     {
@@ -230,7 +230,7 @@ class Bucket
     /**
      * getLifecycle
      *
-     * @return Model
+     * @return \Guzzle\Service\Resource\Model
      */
     public function getLifecycle()
     {
@@ -242,7 +242,7 @@ class Bucket
      *
      * @param array $rules
      *
-     * @return Model
+     * @return \Guzzle\Service\Resource\Model
      */
     public function putLifecycle(array $rules = array())
     {
@@ -257,7 +257,7 @@ class Bucket
     /**
      * deleteLifecycle
      *
-     * @return Model
+     * @return \Guzzle\Service\Resource\Model
      */
     public function deleteLifecycle()
     {
@@ -267,7 +267,7 @@ class Bucket
     /**
      * getLogging
      *
-     * @return Model
+     * @return \Guzzle\Service\Resource\Model
      */
     public function getLogging()
     {
@@ -279,7 +279,7 @@ class Bucket
      *
      * @param array $logging LoggingEnabled
      *
-     * @return Model
+     * @return \Guzzle\Service\Resource\Model
      */
     public function putLogging(array $logging = array())
     {
@@ -294,7 +294,7 @@ class Bucket
     /**
      * getNotification
      *
-     * @return Model
+     * @return \Guzzle\Service\Resource\Model
      */
     public function getNotification()
     {
@@ -306,7 +306,7 @@ class Bucket
      *
      * @param array $config Topic configuration
      *
-     * @return Model
+     * @return \Guzzle\Service\Resource\Model
      */
     public function putNotification(array $config = array())
     {
@@ -322,7 +322,7 @@ class Bucket
     /**
      * getWebsite
      *
-     * @return Model
+     * @return \Guzzle\Service\Resource\Model
      */
     public function getWebsite()
     {
@@ -334,7 +334,7 @@ class Bucket
      *
      * @param array $params
      *
-     * @return Model
+     * @return \Guzzle\Service\Resource\Model
      */
     public function putWebsite(array $params = array())
     {
@@ -346,7 +346,7 @@ class Bucket
     /**
      * deleteWebsite
      *
-     * @return Model
+     * @return \Guzzle\Service\Resource\Model
      */
     public function deleteWebsite()
     {
@@ -356,7 +356,7 @@ class Bucket
     /**
      * getPolicy
      *
-     * @return Model
+     * @return \Guzzle\Service\Resource\Model
      */
     public function getPolicy()
     {
@@ -368,7 +368,7 @@ class Bucket
      *
      * @param mixed $policy mixed type: string|resource|\Guzzle\Http\EntityBodyInterface
      *
-     * @return Model
+     * @return \Guzzle\Service\Resource\Model
      */
     public function putPolicy($policy)
     {
@@ -383,7 +383,7 @@ class Bucket
     /**
      * deletePolicy
      *
-     * @return Model
+     * @return \Guzzle\Service\Resource\Model
      */
     public function deletePolicy()
     {
@@ -404,7 +404,7 @@ class Bucket
     /**
      * getTagging
      *
-     * @return Model
+     * @return \Guzzle\Service\Resource\Model
      */
     public function getTagging()
     {
@@ -416,7 +416,7 @@ class Bucket
      *
      * @param array $tagSet TagSet
      *
-     * @return Model
+     * @return \Guzzle\Service\Resource\Model
      */
     public function putTagging(array $tagSet)
     {
@@ -431,7 +431,7 @@ class Bucket
     /**
      * deleteTagging
      *
-     * @return Model
+     * @return \Guzzle\Service\Resource\Model
      */
     public function deleteTagging()
     {
@@ -441,7 +441,7 @@ class Bucket
     /**
      * getRequestPayment
      *
-     * @return Model
+     * @return \Guzzle\Service\Resource\Model
      */
     public function getRequestPayment()
     {
@@ -453,7 +453,7 @@ class Bucket
      *
      * @param string $payer
      *
-     * @return Model
+     * @return \Guzzle\Service\Resource\Model
      */
     public function putRequestPayment($payer)
     {
@@ -468,7 +468,7 @@ class Bucket
     /**
      * getVersioning
      *
-     * @return Model
+     * @return \Guzzle\Service\Resource\Model
      */
     public function getVersioning()
     {
@@ -482,7 +482,7 @@ class Bucket
      * @param string $delete
      * @param string $status
      *
-     * @return Model
+     * @return \Guzzle\Service\Resource\Model
      */
     public function putVersioning($mfa = null, $delete = null, $status = null)
     {
@@ -510,7 +510,7 @@ class Bucket
      * @param string $key
      * @param array  $params
      *
-     * @return Model
+     * @return \Guzzle\Service\Resource\Model
      */
     public function headObject($key, array $params = array())
     {
@@ -526,7 +526,7 @@ class Bucket
      * @param string $key
      * @param array  $params
      *
-     * @return Model
+     * @return \Guzzle\Service\Resource\Model
      */
     public function getObject($key, array $params = array())
     {
@@ -541,7 +541,7 @@ class Bucket
      *
      * @param string $key
      *
-     * @return Model
+     * @return \Guzzle\Service\Resource\Model
      */
     public function getObjectTorrent($key)
     {
@@ -559,7 +559,7 @@ class Bucket
      * @param string $key
      * @param string $versionId
      *
-     * @return Model
+     * @return \Guzzle\Service\Resource\Model
      */
     public function getObjectAcl($key, $versionId = '')
     {
@@ -580,7 +580,7 @@ class Bucket
      *
      * @param array $params
      *
-     * @return Model
+     * @return \Guzzle\Service\Resource\Model
      */
     public function putObject(array $params = array())
     {
@@ -594,7 +594,7 @@ class Bucket
      *
      * @param array $params
      *
-     * @return Model
+     * @return \Guzzle\Service\Resource\Model
      */
     public function putObjectAcl(array $params = array())
     {
@@ -609,7 +609,7 @@ class Bucket
      * @param string  $key
      * @param integer $days
      *
-     * @return Model
+     * @return \Guzzle\Service\Resource\Model
      */
     public function restoreObject($key, $days)
     {
@@ -654,7 +654,7 @@ class Bucket
      *
      * @param array $params
      *
-     * @return Model
+     * @return \Guzzle\Service\Resource\Model
      */
     public function copyObject(array $params = array())
     {
@@ -668,7 +668,7 @@ class Bucket
      *
      * @param array $params
      *
-     * @return Model
+     * @return \Guzzle\Service\Resource\Model
      */
     public function listObjects(array $params = array())
     {
@@ -682,7 +682,7 @@ class Bucket
      *
      * @param array $params
      *
-     * @return Model
+     * @return \Guzzle\Service\Resource\Model
      */
     public function listObjectVersion(array $params = array())
     {
@@ -713,7 +713,7 @@ class Bucket
      * @param integer $maxParts
      * @param integer $maxNumberMarker
      *
-     * @return Model
+     * @return \Guzzle\Service\Resource\Model
      */
     public function listParts($key, $uploadId, $maxParts = null, $maxNumberMarker = null)
     {
@@ -743,7 +743,7 @@ class Bucket
      * @param integer $partNumber
      * @param string  $contentLength
      *
-     * @return Model
+     * @return \Guzzle\Service\Resource\Model
      */
     public function uploadPart($key, $uploadId, $body, $partNumber, $contentLength = null)
     {
@@ -767,7 +767,7 @@ class Bucket
      *
      * @param array $params
      *
-     * @return Model
+     * @return \Guzzle\Service\Resource\Model
      */
     public function uploadPartCopy(array $params)
     {
@@ -784,7 +784,7 @@ class Bucket
      * @param string $acl
      * @param array  $options
      *
-     * @return Model
+     * @return \Guzzle\Service\Resource\Model
      */
     public function upload($key, $body, $acl = 'private', array $options = array())
     {
@@ -796,7 +796,7 @@ class Bucket
      *
      * @param array $params
      *
-     * @return Model
+     * @return \Guzzle\Service\Resource\Model
      */
     public function createMultipartUpload(array $params = array())
     {
@@ -810,7 +810,7 @@ class Bucket
      *
      * @param array $params
      *
-     * @return Model
+     * @return \Guzzle\Service\Resource\Model
      */
     public function completeMultipartUpload(array $params = array())
     {
@@ -824,7 +824,7 @@ class Bucket
      *
      * @param array $params
      *
-     * @return Model
+     * @return \Guzzle\Service\Resource\Model
      */
     public function listMultipartUpload(array $params = array())
     {
@@ -839,7 +839,7 @@ class Bucket
      * @param string $key
      * @param string $uploadId
      *
-     * @return Model
+     * @return \Guzzle\Service\Resource\Model
      */
     public function abortMultipartUpload($key, $uploadId)
     {
