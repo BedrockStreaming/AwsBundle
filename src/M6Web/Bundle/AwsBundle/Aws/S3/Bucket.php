@@ -692,6 +692,22 @@ class Bucket
     }
 
     /**
+     * deleteObject
+     *
+     * @param string $key
+     * @param array  $params
+     *
+     * @return \Guzzle\Service\Resource\Model
+     */
+    public function deleteObject($key, array $params = array())
+    {
+        $params['Key']    = $key;
+        $params['Bucket'] = $this->name;
+
+        return $this->client->deleteObject($params);
+    }
+
+    /**
      * deleteMatchingObjects
      *
      * @param string $prefix
