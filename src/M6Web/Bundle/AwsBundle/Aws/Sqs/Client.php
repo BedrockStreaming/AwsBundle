@@ -88,6 +88,31 @@ class Client
     }
 
     /**
+     * Gets attributes for the specified queue.
+     *
+     * For more information, please see :
+     * http://docs.aws.amazon.com/aws-sdk-php/latest/class-Aws.Sqs.SqsClient.html#_getQueueAttributes
+     *
+     * @param string $queueId        The name of the queue whose URL must be fetched.
+     * @param array  $attributeNames The names of the attributes to fetch. Defaults to All.
+     *
+     * @return string
+     * @throws SqsException
+     */
+    public function getQueueAttributes($queueId, array $attributeNames = [])
+    {
+        if (count($attributeNames) === 0) {
+            $attributeNames = ['All'];
+        }
+        $result = $this->client->getQueueAttributes(['QueueUrl' => $this->getQueue($queueId), 'AttributeNames' => $attributeNames]);
+        if ($result instanceof Model) {
+            return $result->get('Attributes');
+        }
+
+        return null;
+    }
+
+    /**
      * Deletes the queue specified by the queue name, regardless of whether the queue is empty.
      * If the specified queue does not exist, Amazon SQS returns a successful response.
      * Use DeleteQueue with care; once you delete your queue, any messages in the queue are no longer available.
