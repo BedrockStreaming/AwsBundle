@@ -52,6 +52,54 @@ class Client extends atoum
                      });
     }
 
+    public function testGetQueueAttributes()
+    {
+        // Get queue attributes ok
+        $clientSqs = $this->getClientSqs();
+        $clientSqs->getMockController()->getQueueAttributes = function() {
+            $model = new \mock\Guzzle\Service\Resource\Model();
+            $model->getMockController()->get = function() {
+                return ['ApproximateNumberOfMessages' => 42];
+            };
+            return $model;
+        };
+
+        $this
+            ->if($client = new Base($clientSqs))
+            ->and($queueName = 'name')
+                ->array($client->getQueueAttributes($queueName))
+                    ->isEqualTo(['ApproximateNumberOfMessages' => 42])
+                ->mock($clientSqs)
+                    ->call('getQueueAttributes')
+                        ->withArguments(['QueueUrl' => 'queueUrl', 'AttributeNames' => ['All']])
+                        ->once();
+
+        $this
+            ->if($client = new Base($clientSqs))
+            ->and($queueName = 'name')
+                ->array($client->getQueueAttributes($queueName, ['ApproximateNumberOfMessages']))
+                    ->isEqualTo(['ApproximateNumberOfMessages' => 42])
+                ->mock($clientSqs)
+                    ->call('getQueueAttributes')
+                        ->withArguments(['QueueUrl' => 'queueUrl', 'AttributeNames' => ['ApproximateNumberOfMessages']])
+                        ->once();
+
+
+        // Get queue error
+        $clientSqs->getMockController()->getQueueAttributes = function() {
+            throw new SqsException();
+        };
+
+        $this
+            ->if($client = new Base($clientSqs))
+            ->and($queueName = 'error')
+            ->exception(
+                function() use ($client, $queueName) {
+                    $client->getQueueAttributes($queueName);
+                });
+    }
+
+
     public function testCreateQueue()
     {
         // Create ok
