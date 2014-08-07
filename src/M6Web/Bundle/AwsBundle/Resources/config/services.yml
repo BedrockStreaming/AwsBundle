@@ -14,7 +14,7 @@ parameters:
     m6web_aws.client_factory.class: M6Web\Bundle\AwsBundle\Aws\ClientFactory
     m6web_aws.client_factory.name: "m6web_aws.client_factory"
     m6web_aws.aws_factory.class: Aws\Common\Aws
-    m6web_aws.alias_keys: ['signature_service', 'signature_region', 'curl_options', 'request_options', 'command_params']
+    m6web_aws.alias_keys: ['signature_service', 'signature_region', 'curl_options', 'request_options', 'command_params', 'client_backoff']
 
 services:
     m6web_aws.client_factory:
