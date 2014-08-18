@@ -4,16 +4,16 @@
 
 
 
-### configure your credentials accounts and services
+### configure your AWS user credentials and services
 
 **Reference guide of AWS configuration services**.
- See [http://docs.aws.amazon.com/aws-sdk-php/guide/latest/configuration.html](AWS Configuration reference)
+ See [AWS Configuration reference](http://docs.aws.amazon.com/aws-sdk-php/guide/latest/configuration.html)
 
 - `m6_web_aws`:
-    - `credentials`: # List of credentials accounts
-        - `default`: Name of account
-            - `key`: "azerty" [optional] Your AWS access key ID. See [AWS access keys](http://aws.amazon.com/fr/developers/access-keys/)
-            - `secret`: "1337" [optional] Your AWS secret access key. See [AWS access keys](http://aws.amazon.com/fr/developers/access-keys/)
+    - `credentials`: # List of AWS user credentials
+        - `default`: Name of AWS user
+            - `key`: "azerty" [optional] Your AWS user's access key. See [AWS access keys](http://aws.amazon.com/fr/developers/access-keys/)
+            - `secret`: "1337" [optional] Your AWS user's secret. See [AWS access keys](http://aws.amazon.com/fr/developers/access-keys/)
             - `region`: "us-west-2" [optional] Region name (e.g., 'us-east-1', 'us-west-1', 'us-west-2', 'eu-west-1', etc.)
             - `scheme`: [optional] URI Scheme of the base URL (e.g.. 'https', 'http') used when base_url is not supplied.
             - `base_url`: [optional] Allows you to specify a custom endpoint instead of have the SDK build one automatically from the region and scheme.
@@ -23,14 +23,14 @@
             - `curl_options`: [optional] Alias of curl.options
             - `request_options`: [optional] Alias of request.options
             - `command_params`: [optional] Alias of command.params
-        - `ops`: # Another accounts
+        - `ops`: # Another AWS user
             - `key`: ...
             - `secret`:
             - `region`:
 
     - `clients`:
         - `6cloud_cdn`:
-            - `credential`: "default" [optional] Account name
+            - `credential`: "default" [optional] AWS user name
             - `service`: "S3" [required] AWS service Alias (see below)
             - `region`: "us-west-1" [optional] Override region name.
 
@@ -52,7 +52,7 @@
             - `client`: "6cloud_cdn" Client name defined above
 
 
-### AWS Services Alias :
+### Aliases for AWS Services :
 
 **(case sensitive)**
 
@@ -128,18 +128,18 @@
     echo "Token : " . $credentials->getSecurityToken() . "\n";
 ```
 
-### dataCollector
+### DataCollector
 
-Datacollector is enabled by defaut.
+DataCollector is enabled by defaut.
 
-To de-activate
+To disable :
 
 ```
 m6_web_aws:
     disable_data_collector: true
 ```
 
-# Unit Test
+# Unit tests :
 
 ```
     composer install
