@@ -12,11 +12,11 @@
 - `m6_web_aws`:
     - `credentials`: # List of AWS user credentials
         - `default`: Name of AWS user
-            - `key`: "azerty" [optional] Your AWS user's access key. See [AWS access keys](http://aws.amazon.com/fr/developers/access-keys/)
-            - `secret`: "1337" [optional] Your AWS user's secret. See [AWS access keys](http://aws.amazon.com/fr/developers/access-keys/)
+            - `key`: "azerty" [optional] Your AWS user's access key ID. See [AWS access keys](http://aws.amazon.com/fr/developers/access-keys/)
+            - `secret`: "1337" [optional] Your AWS user's secret access key. See [AWS access keys](http://aws.amazon.com/fr/developers/access-keys/)
             - `region`: "us-west-2" [optional] Region name (e.g., 'us-east-1', 'us-west-1', 'us-west-2', 'eu-west-1', etc.)
             - `scheme`: [optional] URI Scheme of the base URL (e.g.. 'https', 'http') used when base_url is not supplied.
-            - `base_url`: [optional] Allows you to specify a custom endpoint instead of have the SDK build one automatically from the region and scheme.
+            - `base_url`: [optional] Allows you to specify a custom endpoint instead of having the SDK build one automatically from the region and scheme.
             - `signature`: [optional]
             - `signature_service`: [optional] Alias of signature.service. The signature service scope for Signature V4. See [Setting a custom endpoint](http://docs.aws.amazon.com/aws-sdk-php/guide/latest/configuration.html#custom-endpoint)
             - `signature_region`: [optional] Alias of signature.region. The signature region scope for Signature V4. See [Setting a custom endpoint](http://docs.aws.amazon.com/aws-sdk-php/guide/latest/configuration.html#custom-endpoint)
