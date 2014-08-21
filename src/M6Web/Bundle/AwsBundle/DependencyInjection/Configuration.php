@@ -45,7 +45,7 @@ class Configuration implements ConfigurationInterface
                                 ->prototype('scalar')->end()
                             ->end()
                             ->booleanNode('credentials_cache')->defaultValue(false)->end()
-                            ->booleanNode('validation')->end()
+                            ->booleanNode('validation')->defaultValue(true)->end()
                         ->end()
                     ->end()
                 ->end()
