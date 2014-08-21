@@ -22,6 +22,8 @@ class ClientFactory
      *
      * @param string $factoryClass Factory class name
      * @param array  $aliasKeys    key list
+     *
+     * @throws \InvalidArgumentException
      */
     public function __construct($factoryClass, array $aliasKeys = array())
     {
