@@ -44,6 +44,7 @@ class Configuration implements ConfigurationInterface
                             ->arrayNode('command_params')
                                 ->prototype('scalar')->end()
                             ->end()
+                            ->booleanNode('credentials_cache')->defaultValue(false)->end()
                         ->end()
                     ->end()
                 ->end()
