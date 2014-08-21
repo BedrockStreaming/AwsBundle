@@ -19,5 +19,8 @@
         "atoum/atoum-bundle" : "dev-master",
         "m6web/coke" : "~1.2",
         "m6web/symfony2-coding-standard" : "~1.1"
+    },
+    "suggest" : {
+        "doctrine/cache" : "1.3.0"
     }
 }
