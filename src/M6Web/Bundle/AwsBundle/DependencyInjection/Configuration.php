@@ -44,7 +44,7 @@ class Configuration implements ConfigurationInterface
                             ->arrayNode('command_params')
                                 ->prototype('scalar')->end()
                             ->end()
-                            ->scalarNode('validation')->end()
+                            ->booleanNode('validation')->end()
                         ->end()
                     ->end()
                 ->end()
