@@ -11,28 +11,28 @@ class Proxy
 {
     /**
      * DynamoDb Client
-     * 
+     *
      * @var DynamoDb\Client
      */
     protected $client;
 
     /**
      * Event dispatcher
-     * 
+     *
      * @var Object
      */
     protected $eventDispatcher = null;
 
     /**
      * Class of the event notifier
-     * 
+     *
      * @var string
      */
     protected $eventClass = null;
 
     /**
      * __construct
-     * 
+     *
      * @param Client $client
      */
     public function __construct(Client $client)
@@ -42,7 +42,7 @@ class Proxy
 
     /**
      * Direct access to the DynamoDb Client
-     * 
+     *
      * @return Client
      */
     public function getClient()
@@ -108,14 +108,10 @@ class Proxy
     {
         if ($client = $this->getClient()) {
             $start = microtime(true);
-            try {
-                $ret = call_user_func_array(array($client, $name), $arguments);
-                $this->notifyEvent($name, $arguments, microtime(true) - $start);
+            $ret = call_user_func_array(array($client, $name), $arguments);
+            $this->notifyEvent($name, $arguments, microtime(true) - $start);
 
-                return $ret;
-            } catch (DynamoDbException $e) {
-                throw new Exception("Error calling the method " . $name . " : " . $e->getMessage());
-            }
+            return $ret;
         } else {
             throw new Exception("Cant connect to DynamoDb");
         }
