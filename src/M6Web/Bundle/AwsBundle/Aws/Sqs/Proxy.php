@@ -2,9 +2,6 @@
 
 namespace M6Web\Bundle\AwsBundle\Aws\Sqs;
 
-use Aws\Sqs\Exception\SqsException;
-use M6Web\Bundle\AwsBundle\Event\Dispatchable;
-
 /**
  * Sqs Proxy Client
  */

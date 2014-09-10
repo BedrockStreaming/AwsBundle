@@ -2,8 +2,6 @@
 
 namespace M6Web\Bundle\AwsBundle\Aws\DynamoDb;
 
-use Aws\DynamoDb\Exception\DynamoDbException;
-
 /**
  * DynamoDb Client Proxy
  */

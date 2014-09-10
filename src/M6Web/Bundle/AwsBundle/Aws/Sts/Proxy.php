@@ -2,8 +2,6 @@
 
 namespace M6Web\Bundle\AwsBundle\Aws\Sts;
 
-use Aws\Sts\Exception\StsException;
-
 /**
  * Sts Client Proxy
  */
