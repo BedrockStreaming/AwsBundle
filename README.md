@@ -1,4 +1,4 @@
-# AWS-BUNDLE
+# AWS-BUNDLE [![Build Status](https://travis-ci.org/M6Web/AwsBundle.svg?branch=master)](https://travis-ci.org/M6Web/AwsBundle)
 
 #### Aws client as a Symfony Service
 
