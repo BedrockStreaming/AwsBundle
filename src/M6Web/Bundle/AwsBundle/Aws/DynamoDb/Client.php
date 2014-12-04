@@ -662,7 +662,7 @@ class Client
     /**
      * Transforms the given array into a consistent one, to be hashed as a cache key.
      *
-     * @param array &$array Array to transform
+     * @param array $array Array to transform
      *
      * @return void
      */
