@@ -70,7 +70,7 @@ class Bucket
      * exist
      *
      * @param boolean $accept403
-     * @param array  $options
+     * @param array   $options
      *
      * @return boolean
      */
