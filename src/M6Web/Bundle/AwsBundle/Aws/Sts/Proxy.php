@@ -2,8 +2,6 @@
 
 namespace M6Web\Bundle\AwsBundle\Aws\Sts;
 
-use Aws\Sts\Exception\StsException;
-
 /**
  * Sts Client Proxy
  */
@@ -11,28 +9,28 @@ class Proxy
 {
     /**
      * Sts Client
-     * 
+     *
      * @var Sts\Client
      */
     protected $client;
 
     /**
      * Event dispatcher
-     * 
+     *
      * @var Object
      */
     protected $eventDispatcher = null;
 
     /**
      * Class of the event notifier
-     * 
+     *
      * @var string
      */
     protected $eventClass = null;
 
     /**
      * __construct
-     * 
+     *
      * @param Client $client
      */
     public function __construct(Client $client)
@@ -42,7 +40,7 @@ class Proxy
 
     /**
      * Direct access to the Sts Client
-     * 
+     *
      * @return Client
      */
     public function getClient()
@@ -108,14 +106,10 @@ class Proxy
     {
         if ($client = $this->getClient()) {
             $start = microtime(true);
-            try {
-                $ret = call_user_func_array(array($client, $name), $arguments);
-                $this->notifyEvent($name, $arguments, microtime(true) - $start);
+            $ret = call_user_func_array(array($client, $name), $arguments);
+            $this->notifyEvent($name, $arguments, microtime(true) - $start);
 
-                return $ret;
-            } catch (StsException  $e) {
-                throw new Exception("Error calling the method " . $name . " : " . $e->getMessage());
-            }
+            return $ret;
         } else {
             throw new Exception("Cant connect to Sts");
         }

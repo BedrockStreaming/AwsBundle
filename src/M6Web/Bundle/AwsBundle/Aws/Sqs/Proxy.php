@@ -2,9 +2,6 @@
 
 namespace M6Web\Bundle\AwsBundle\Aws\Sqs;
 
-use Aws\Sqs\Exception\SqsException;
-use M6Web\Bundle\AwsBundle\Event\Dispatchable;
-
 /**
  * Sqs Proxy Client
  */
@@ -109,14 +106,10 @@ class Proxy
     {
         if ($sqs = $this->getClient()) {
             $start = microtime(true);
-            try {
-                $ret = call_user_func_array(array($sqs, $name), $arguments);
-                $this->notifyEvent($name, $arguments, microtime(true) - $start);
+            $ret = call_user_func_array(array($sqs, $name), $arguments);
+            $this->notifyEvent($name, $arguments, microtime(true) - $start);
 
-                return $ret;
-            } catch (SqsException $e) {
-                throw new Exception("Error calling the method ".$name." : ".$e->getMessage());
-            }
+            return $ret;
         } else {
             throw new Exception("Cant connect to Sqs");
         }
