@@ -60,7 +60,7 @@ class Client
     {
         $result = $this->client->createQueue([
             'QueueName' => $queueId,
-            'Attributes' => $attributes
+            'Attributes' => $attributes,
         ]);
 
         $this->queues[$queueId] = $result->get('QueueUrl');
@@ -194,7 +194,7 @@ class Client
     {
         $args = [
             'QueueUrl' => $this->getQueue($queueId),
-            'Entries' => $entries
+            'Entries' => $entries,
         ];
 
         $result = $this->client->sendMessageBatch($args);
@@ -234,12 +234,11 @@ class Client
         $visibilityTimeout = null,
         array $attributeNames = array(),
         array $messageAttributeNames = array()
-    )
-    {
+    ) {
         $args = [
             'QueueUrl' => $this->getQueue($queueId),
             'MaxNumberOfMessages' => $maxNumberOfMessages,
-            'WaitTimeSeconds' => $waitTimeSeconds
+            'WaitTimeSeconds' => $waitTimeSeconds,
         ];
 
         if ($visibilityTimeout !== null) {
@@ -285,7 +284,7 @@ class Client
     {
         $result = $this->client->deleteMessage([
             'QueueUrl' => $this->getQueue($queueId),
-            'ReceiptHandle' => $receiptHandle
+            'ReceiptHandle' => $receiptHandle,
         ]);
 
         if ($result instanceof Model) {
@@ -316,7 +315,7 @@ class Client
     {
         $result = $this->client->deleteMessageBatch([
             'QueueUrl' => $this->getQueue($queueId),
-            'Entries' => $entries
+            'Entries' => $entries,
         ]);
 
         if ($result instanceof Model) {

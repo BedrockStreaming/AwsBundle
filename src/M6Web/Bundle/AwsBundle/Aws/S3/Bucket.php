@@ -4,7 +4,6 @@ namespace M6Web\Bundle\AwsBundle\Aws\S3;
 
 use Aws\S3\S3Client;
 
-
 /**
  * Bucket
  */
@@ -90,7 +89,7 @@ class Bucket
     {
         $params = [
             'Bucket' => $this->name,
-            'Policy' => $policy
+            'Policy' => $policy,
         ];
 
         return $this->client->waitUntilBucketExists($params);
@@ -211,7 +210,7 @@ class Bucket
     {
         $params = [
             'Bucket'    => $this->name,
-            'CORSRules' => $corsRules
+            'CORSRules' => $corsRules,
         ];
 
         return $this->client->putBucketCors($params);
@@ -248,7 +247,7 @@ class Bucket
     {
         $params = [
             'Bucket' => $this->name,
-            'Rules'  => $rules
+            'Rules'  => $rules,
         ];
 
         return $this->client->putBucketLifecycle($params);
@@ -285,7 +284,7 @@ class Bucket
     {
         $params = [
             'Bucket'         => $this->name,
-            'LoggingEnabled' => $logging
+            'LoggingEnabled' => $logging,
         ];
 
         return $this->client->putBucketLogging($params);
@@ -312,7 +311,7 @@ class Bucket
     {
         $params = [
             'Bucket'             => $this->name,
-            'TopicConfiguration' => $config
+            'TopicConfiguration' => $config,
         ];
 
         return $this->client->putBucketNotification($params);
@@ -374,7 +373,7 @@ class Bucket
     {
         $params = [
             'Bucket' => $this->name,
-            'Policy' => $policy
+            'Policy' => $policy,
         ];
 
         return $this->client->putBucketPolicy($params);
@@ -392,7 +391,7 @@ class Bucket
 
     /**
      * policyExist
-     * @param array  $options
+     * @param array $options
      *
      * @return boolean
      */
@@ -422,7 +421,7 @@ class Bucket
     {
         $params = [
             'Bucket' => $this->name,
-            'TagSet' => $tagSet
+            'TagSet' => $tagSet,
         ];
 
         return $this->client->putBucketTagging($params);
@@ -459,7 +458,7 @@ class Bucket
     {
         $params = [
             'Bucket' => $this->name,
-            'Payer'  => $payer
+            'Payer'  => $payer,
         ];
 
         return $this->client->putBucketRequestPayment($params);
@@ -547,7 +546,7 @@ class Bucket
     {
         $params = [
             'Bucket' => $this->name,
-            'Key'    => $key
+            'Key'    => $key,
         ];
 
         return $this->client->getObjectTorrent($params);
@@ -565,7 +564,7 @@ class Bucket
     {
         $params = [
             'Bucket' => $this->name,
-            'Key'    => $key
+            'Key'    => $key,
         ];
 
         if ($versionId) {
@@ -616,7 +615,7 @@ class Bucket
         $params = [
             'Bucket' => $this->name,
             'Key'    => $key,
-            'Days'   => $days
+            'Days'   => $days,
         ];
 
         return $this->client->restoreObject($params);
@@ -736,7 +735,7 @@ class Bucket
         $params = [
             'Bucket'   => $this->name,
             'Key'      => $key,
-            'UploadId' => $uploadId
+            'UploadId' => $uploadId,
         ];
 
         if (!is_null($maxParts)) {
@@ -768,7 +767,7 @@ class Bucket
             'Key'        => $key,
             'UploadId'   => $uploadId,
             'Body'       => $body,
-            'PartNumber' => $partNumber
+            'PartNumber' => $partNumber,
         ];
 
         if (!is_null($contentLength)) {
@@ -862,7 +861,7 @@ class Bucket
         return $this->client->abortMultipartUpload([
             'Bucket'   => $this->name,
             'Key'      => $key,
-            'UploadId' => $uploadId
+            'UploadId' => $uploadId,
         ]);
     }
 
@@ -925,5 +924,4 @@ class Bucket
     {
         return $this->name;
     }
-
 }

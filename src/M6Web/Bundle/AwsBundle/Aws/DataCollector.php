@@ -40,7 +40,6 @@ class DataCollector extends SymfonyDataCollector
      */
     public function collect(Request $request, Response $response, \Exception $exception = null)
     {
-
     }
 
     /**
@@ -53,7 +52,7 @@ class DataCollector extends SymfonyDataCollector
         $this->data['commands'][] = array(
             'command'   => $event->getCommand(),
             'arguments' => $event->getArguments(),
-            'executiontime' => $event->getExecutionTime()
+            'executiontime' => $event->getExecutionTime(),
         );
     }
 

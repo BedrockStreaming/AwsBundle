@@ -41,44 +41,6 @@ class ClientFactory
     }
 
     /**
-     * testFactoryClass
-     *
-     * @param string $factoryClass Factory class name
-     *
-     * @return boolean
-     */
-    protected function testFactoryClass($factoryClass)
-    {
-        if ($factoryClass == self::AWS_FACTORY_CLASS) {
-            return true;
-        }
-
-        $reflection = new \ReflectionClass($factoryClass);
-
-        if ($reflection->isSubclassOf(self::AWS_FACTORY_CLASS)) {
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
-     * filterAliasKey
-     *
-     * @param string $name Config name
-     *
-     * @return string
-     */
-    protected function filterAliasKey($name)
-    {
-        if (in_array($name, $this->aliasKeys)) {
-            return str_replace('_', '.', $name);
-        }
-
-        return $name;
-    }
-
-    /**
      * get
      *
      * @param string $service Aws Service alias
@@ -124,4 +86,42 @@ class ClientFactory
         return $this->aliasKeys;
     }
 
+
+    /**
+     * testFactoryClass
+     *
+     * @param string $factoryClass Factory class name
+     *
+     * @return boolean
+     */
+    protected function testFactoryClass($factoryClass)
+    {
+        if ($factoryClass == self::AWS_FACTORY_CLASS) {
+            return true;
+        }
+
+        $reflection = new \ReflectionClass($factoryClass);
+
+        if ($reflection->isSubclassOf(self::AWS_FACTORY_CLASS)) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * filterAliasKey
+     *
+     * @param string $name Config name
+     *
+     * @return string
+     */
+    protected function filterAliasKey($name)
+    {
+        if (in_array($name, $this->aliasKeys)) {
+            return str_replace('_', '.', $name);
+        }
+
+        return $name;
+    }
 }

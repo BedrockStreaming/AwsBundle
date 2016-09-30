@@ -11,28 +11,28 @@ class Proxy
 {
     /**
      * DynamoDb Client
-     * 
+     *
      * @var DynamoDb\Client
      */
     protected $client;
 
     /**
      * Event dispatcher
-     * 
+     *
      * @var Object
      */
     protected $eventDispatcher = null;
 
     /**
      * Class of the event notifier
-     * 
+     *
      * @var string
      */
     protected $eventClass = null;
 
     /**
      * __construct
-     * 
+     *
      * @param Client $client
      */
     public function __construct(Client $client)
@@ -42,7 +42,7 @@ class Proxy
 
     /**
      * Direct access to the DynamoDb Client
-     * 
+     *
      * @return Client
      */
     public function getClient()
@@ -77,7 +77,7 @@ class Proxy
      * Set an event dispatcher to notify redis command
      *
      * @param Object $eventDispatcher The eventDispatcher object, which implement the notify method
-     * @param string $eventClass The event class used to create an event and send it to the event dispatcher
+     * @param string $eventClass      The event class used to create an event and send it to the event dispatcher
      *
      * @return void
      */
@@ -114,7 +114,7 @@ class Proxy
 
                 return $ret;
             } catch (DynamoDbException $e) {
-                throw new Exception("Error calling the method " . $name . " : " . $e->getMessage());
+                throw new Exception("Error calling the method ".$name." : ".$e->getMessage());
             }
         } else {
             throw new Exception("Cant connect to DynamoDb");
