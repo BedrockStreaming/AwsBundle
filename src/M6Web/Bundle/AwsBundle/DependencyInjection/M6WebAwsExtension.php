@@ -67,7 +67,7 @@ class M6WebAwsExtension extends Extension
                             [
                                 new Reference($config['cache']['service']),
                                 $config['cache']['ttl'],
-                                $config['cache']['key_prefix']
+                                $config['cache']['key_prefix'],
                             ]
                         );
                     }
@@ -90,7 +90,7 @@ class M6WebAwsExtension extends Extension
         $factoryService = $container->getParameter('m6web_aws.client_factory.name');
         $params         = [
             'service' => $config['service'],
-            'config'  => !empty($config['credential']) ? $credentials[$config['credential']] : array()
+            'config'  => !empty($config['credential']) ? $credentials[$config['credential']] : array(),
         ];
 
         if (!empty($config['region'])) {
@@ -102,10 +102,7 @@ class M6WebAwsExtension extends Extension
         }
 
         $definition = new Definition($className, $params);
-
-        $definition
-                    ->setFactoryService($factoryService)
-                    ->setFactoryMethod('get');
+        $definition->setFactory([new Reference($factoryService), 'get']);
 
         $container->setDefinition(sprintf('m6web_aws.%s', $name), $definition);
     }
@@ -122,14 +119,14 @@ class M6WebAwsExtension extends Extension
      */
     protected function loadProxyClient(ContainerBuilder $container, array $configs, $configKey, \Closure $onCreate = null)
     {
-        $clientClassName = $container->getParameter('m6web_aws.' . $configKey . '.client.class');
-        $proxyClassName  = $container->getParameter('m6web_aws.' . $configKey . '.proxy.class');
+        $clientClassName = $container->getParameter('m6web_aws.'.$configKey.'.client.class');
+        $proxyClassName  = $container->getParameter('m6web_aws.'.$configKey.'.proxy.class');
 
         foreach ($configs as $name => $config) {
             // Aws Client
             $awsClientName = sprintf('m6web_aws.%s', $config['client']);
             $params        = [
-                'client' => new Reference($awsClientName)
+                'client' => new Reference($awsClientName),
             ];
 
             // M6 Client
@@ -140,21 +137,20 @@ class M6WebAwsExtension extends Extension
                 $onCreate($clientDefinition, $config);
             }
 
-            $clientName       = sprintf('m6web_aws.' . $configKey . 'client.%s', $name);
+            $clientName       = sprintf('m6web_aws.'.$configKey.'client.%s', $name);
             $container->setDefinition($clientName, $clientDefinition);
 
             // M6 Proxy
             $params = [
-                'client' => new Reference($clientName)
+                'client' => new Reference($clientName),
             ];
 
             $proxyDefinition = new Definition($proxyClassName, $params);
-            $proxyDefinition->setScope(ContainerInterface::SCOPE_CONTAINER);
             $proxyDefinition->addMethodCall(
                 'setEventDispatcher',
                 [new Reference('event_dispatcher'), 'M6Web\Bundle\AwsBundle\Event\Command']
             );
-            $container->setDefinition(sprintf('m6web_aws.' . $configKey . '.%s', $name), $proxyDefinition);
+            $container->setDefinition(sprintf('m6web_aws.'.$configKey.'.%s', $name), $proxyDefinition);
         }
     }
 
@@ -186,12 +182,11 @@ class M6WebAwsExtension extends Extension
         $clientName = sprintf('m6web_aws.%s', $config['client']);
         $params     = [
             'client' => new Reference($clientName),
-            'name'   => $config['name']
+            'name'   => $config['name'],
         ];
 
         $definition = new Definition($className, $params);
 
         $container->setDefinition(sprintf('m6web_aws.bucket.%s', $name), $definition);
     }
-
 }

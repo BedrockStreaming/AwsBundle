@@ -178,7 +178,7 @@ class Client
     {
         $args = [
             'RequestItems'           => $requestItems,
-            'ReturnConsumedCapacity' => $returnConsumedCapacity
+            'ReturnConsumedCapacity' => $returnConsumedCapacity,
         ];
 
         // Try to load from cache is a cacheService is available
@@ -218,7 +218,7 @@ class Client
             [
                 'RequestItems'                => $requestItems,
                 'ReturnConsumedCapacity'      => $returnConsumedCapacity,
-                'ReturnItemCollectionMetrics' => $returnItemCollectionMetrics
+                'ReturnItemCollectionMetrics' => $returnItemCollectionMetrics,
             ]
         );
     }
@@ -243,7 +243,7 @@ class Client
             'AttributeDefinitions'   => $attributeDefinitions,
             'TableName'              => $tableName,
             'KeySchema'              => $keySchema,
-            'ProvisionedThroughput'  => $provisionedThroughput
+            'ProvisionedThroughput'  => $provisionedThroughput,
         ];
 
         if ($localSecondaryIndexes !== null) {
@@ -280,7 +280,7 @@ class Client
             'ConditionnalOperator'        => $conditionnalOperator,
             'ReturnValues'                => $returnValues,
             'ReturnConsumedCapacity'      => $returnConsumedCapacity,
-            'ReturnItemCollectionMetrics' => $returnItemCollectionMetrics
+            'ReturnItemCollectionMetrics' => $returnItemCollectionMetrics,
         ];
 
         if ($expected !== null) {
@@ -339,7 +339,7 @@ class Client
             'TableName'              => $tableName,
             'Key'                    => $key,
             'ConsistentRead'         => $consistentRead,
-            'ReturnConsumedCapacity' => $returnConsumedCapacity
+            'ReturnConsumedCapacity' => $returnConsumedCapacity,
         ];
 
         if ($attributesToGet !== null) {
@@ -428,7 +428,7 @@ class Client
             'ConditionnalOperator'        => $conditionnalOperator,
             'ReturnValues'                => $returnValues,
             'ReturnConsumedCapacity'      => $returnConsumedCapacity,
-            'ReturnItemCollectionMetrics' => $returnItemCollectionMetrics
+            'ReturnItemCollectionMetrics' => $returnItemCollectionMetrics,
         ];
 
         if ($expected !== null) {
@@ -498,7 +498,7 @@ class Client
             'ConditionnalOperator'        => $conditionnalOperator,
             'ReturnValues'                => $returnValues,
             'ReturnConsumedCapacity'      => $returnConsumedCapacity,
-            'ReturnItemCollectionMetrics' => $returnItemCollectionMetrics
+            'ReturnItemCollectionMetrics' => $returnItemCollectionMetrics,
         ];
 
         if ($attributeUpdates !== null) {
@@ -579,7 +579,7 @@ class Client
         return $this->client->getBatchGetItemIterator(
             [
                 'RequestItems'           => $requestItems,
-                'ReturnConsumedCapacity' => $returnConsumedCapacity
+                'ReturnConsumedCapacity' => $returnConsumedCapacity,
             ]
         );
     }
@@ -654,7 +654,7 @@ class Client
     {
         self::recursiveArgumentsSort($args);
 
-        $cacheKey = $this->cacheKeyPrefix . '_' . md5(serialize($args));
+        $cacheKey = $this->cacheKeyPrefix.'_'.md5(serialize($args));
 
         return $cacheKey;
     }

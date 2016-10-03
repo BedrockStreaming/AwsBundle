@@ -2,7 +2,6 @@
 
 namespace M6Web\Bundle\AwsBundle\Event;
 
-
 /**
  * Dispatcher interface
  */

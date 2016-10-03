@@ -2,7 +2,6 @@
 
 namespace M6Web\Bundle\AwsBundle\Cache;
 
-
 /**
 * Interface CacheInterface - Interface for cache system on AWSBundle
 *
@@ -48,7 +47,7 @@ interface CacheInterface
 
     /**
      * Returns the TTL in second of a cache key or false if key doesn't exist.
-     * 
+     *
      * @param string $key The key
      *
      * @return integer|false the ttl or false
