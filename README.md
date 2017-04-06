@@ -2,7 +2,9 @@
 
 #### Aws client as a Symfony Service
 
+# /!\ This bundle is deprecated
 
+Please use the official [AWS Symfony bundle](https://github.com/aws/aws-sdk-php-symfony) instead.
 
 ### configure your AWS user credentials and services
 
