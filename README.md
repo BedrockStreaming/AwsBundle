@@ -2,7 +2,7 @@
 
 #### Aws client as a Symfony Service
 
-# /!\ This bundle is deprecated
+# ⚠ This bundle is deprecated
 
 Please use the official [AWS Symfony bundle](https://github.com/aws/aws-sdk-php-symfony) instead.
 
